@@ -4,6 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rxordle — Guess the medication</title>
+
+<!-- Favicon / app icons -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<!-- Open Graph (used by iMessage, Slack, Facebook, etc. for link previews) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Rxordle">
+<meta property="og:title" content="Rxordle — Guess the medication">
+<meta property="og:description" content="A daily medication-guessing game for healthcare professionals. Six clues, one drug — how fast can you name it?">
+<meta property="og:image" content="https://rxordle.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://rxordle.org/">
+
+<!-- Twitter Card (also used as a fallback by some link-preview crawlers) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rxordle — Guess the medication">
+<meta name="twitter:description" content="A daily medication-guessing game for healthcare professionals. Six clues, one drug — how fast can you name it?">
+<meta name="twitter:image" content="https://rxordle.org/og-image.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -2420,7 +2443,7 @@ function shareText(dateStr, usedClues, won){
     else squares += '\u2b1c';
   }
   const scoreLine = won ? (usedClues+'/6') : 'X/6';
-  return 'Rxordle '+dateStr+' \u2014 '+scoreLine+'\n'+squares+'\nCan you name the medication?\nPlay at https://michaelblanchard530-collab.github.io/Rxordle/';
+  return 'Rxordle '+dateStr+' \u2014 '+scoreLine+'\n'+squares+'\nCan you name the medication?\nPlay at https://rxordle.org/';
 }
 
 function buildShareBox(usedClues, won){

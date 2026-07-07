@@ -2443,7 +2443,7 @@ function shareText(dateStr, usedClues, won){
     else squares += '\u2b1c';
   }
   const scoreLine = won ? (usedClues+'/6') : 'X/6';
-  return '\ud83d\udc8a Rxordle '+dateStr+' \u2014 '+scoreLine+'\n'+squares+'\nCan you name the medication?\nhttps://rxordle.org/';
+  return 'https://rxordle.org/\n\ud83d\udc8a Rxordle '+dateStr+' \u2014 '+scoreLine+'\n'+squares+'\nCan you name the medication?';
 }
 
 function buildShareBox(usedClues, won){

@@ -2443,7 +2443,7 @@ function shareText(dateStr, usedClues, won){
     else squares += '\u2b1c';
   }
   const scoreLine = won ? (usedClues+'/6') : 'X/6';
-  return 'Rxordle '+dateStr+' \u2014 '+scoreLine+'\n'+squares+'\nCan you name the medication?\nPlay at https://rxordle.org/';
+  return '\ud83d\udc8a Rxordle '+dateStr+' \u2014 '+scoreLine+'\n'+squares+'\nCan you name the medication?\nhttps://rxordle.org/';
 }
 
 function buildShareBox(usedClues, won){
@@ -2458,16 +2458,40 @@ function buildShareBox(usedClues, won){
   const btn = document.createElement('button');
   btn.className = 'copybtn';
   btn.textContent = 'Copy to share';
-  btn.onclick = () => {
-    navigator.clipboard.writeText(text).then(()=>{
-      btn.textContent = 'Copied!';
-      btn.classList.add('copied');
-      setTimeout(()=>{ btn.textContent='Copy to share'; btn.classList.remove('copied'); }, 1800);
-    }).catch(()=>{
+
+  const showCopied = () => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy to share'; btn.classList.remove('copied'); }, 1800);
+  };
+  const showFailed = () => {
+    btn.textContent = 'Tap the text above to select it';
+    setTimeout(()=>{ btn.textContent='Copy to share'; }, 2200);
+  };
+  const fallbackCopy = () => {
+    try{
+      textarea.removeAttribute('readonly');
+      textarea.focus();
       textarea.select();
-      document.execCommand('copy');
-      btn.textContent = 'Copied!';
-    });
+      textarea.setSelectionRange(0, text.length); // needed on iOS Safari
+      const ok = document.execCommand('copy');
+      textarea.setAttribute('readonly', '');
+      if(ok) showCopied(); else showFailed();
+    }catch(e){
+      showFailed();
+    }
+  };
+
+  btn.onclick = () => {
+    // navigator.clipboard can be entirely absent (insecure context, older
+    // browser, some embedded/sandboxed views) -- calling .writeText on
+    // undefined would throw synchronously and skip the .catch() below,
+    // so check for it explicitly before ever touching it.
+    if(window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showCopied).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
   };
   wrapDiv.appendChild(textarea);
   wrapDiv.appendChild(btn);

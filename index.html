@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rxordle — Guess the medication</title>
+<title>Rxordle: Guess the medication</title>
 
 <!-- Favicon / app icons -->
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -14,8 +14,8 @@
 <!-- Open Graph (used by iMessage, Slack, Facebook, etc. for link previews) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rxordle">
-<meta property="og:title" content="Rxordle — Guess the medication">
-<meta property="og:description" content="A daily medication-guessing game for healthcare professionals. Six clues, one drug — how fast can you name it?">
+<meta property="og:title" content="Rxordle: Guess the medication">
+<meta property="og:description" content="A daily medication-guessing game for healthcare professionals. Six clues, one drug. How fast can you name it?">
 <meta property="og:image" content="https://rxordle.org/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -23,8 +23,8 @@
 
 <!-- Twitter Card (also used as a fallback by some link-preview crawlers) -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Rxordle — Guess the medication">
-<meta name="twitter:description" content="A daily medication-guessing game for healthcare professionals. Six clues, one drug — how fast can you name it?">
+<meta name="twitter:title" content="Rxordle: Guess the medication">
+<meta name="twitter:description" content="A daily medication-guessing game for healthcare professionals. Six clues, one drug. How fast can you name it?">
 <meta name="twitter:image" content="https://rxordle.org/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2118,9 +2118,20 @@ function hashStr(s){
   return Math.abs(h);
 }
 function drugForDate(dateStr){
+  const overrideName = DATE_OVERRIDES[dateStr];
+  if(overrideName){
+    const override = DRUGS.find(d => d.name === overrideName);
+    if(override) return override;
+  }
   const idx = hashStr(dateStr) % DRUGS.length;
   return DRUGS[idx];
 }
+// Manual overrides for specific dates, e.g. to avoid a repeat or swap in a
+// different therapeutic area. Keys are 'YYYY-MM-DD', values must exactly
+// match a drug's "name" field in the DRUGS array.
+const DATE_OVERRIDES = {
+  '2026-07-07': 'Furosemide'
+};
 const TODAY = todayStr();
 const ARCHIVE_DAYS = 30; // how many past days to list in the archive
 
@@ -2443,7 +2454,7 @@ function shareText(dateStr, usedClues, won){
     else squares += '\u2b1c';
   }
   const scoreLine = won ? (usedClues+'/6') : 'X/6';
-  return 'https://rxordle.org/\n\ud83d\udc8a Rxordle '+dateStr+' \u2014 '+scoreLine+'\n'+squares+'\nCan you name the medication?';
+  return 'https://rxordle.org/\n\ud83d\udc8a Rxordle '+dateStr+' - '+scoreLine+'\n'+squares+'\nCan you name the medication?';
 }
 
 function buildShareBox(usedClues, won){
@@ -2652,7 +2663,7 @@ function submitGuess(){
     const isClose = matchDrug.cls === ctx.drug.cls;
     ctx.state.guesses.push({ name: match, close: isClose });
     if(isClose){
-      showToast('\u{1F914} Close! Same drug class \u2014 wrong medication. Keep going.', 'close-toast');
+      showToast('\u{1F914} Close! Same drug class, wrong medication. Keep going.', 'close-toast');
       playAlmostSound();
     }
     if(ctx.state.guesses.length >= 6){
@@ -2695,7 +2706,7 @@ tabStats.addEventListener('click', () => {
 async function renderStatsPanel(){
   const stats = await loadStats();
   const winPct = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
-  const avgClues = stats.wins > 0 ? (stats.totalCluesOnWin / stats.wins).toFixed(1) : '\u2014';
+  const avgClues = stats.wins > 0 ? (stats.totalCluesOnWin / stats.wins).toFixed(1) : 'N/A';
   const level = levelFromXP(stats.totalXP);
   const xpIntoLevel = stats.totalXP % XP_PER_LEVEL;
   const xpPct = Math.round((xpIntoLevel / XP_PER_LEVEL) * 100);

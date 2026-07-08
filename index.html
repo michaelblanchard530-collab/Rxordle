@@ -4033,14 +4033,48 @@ function hashStr(s){
   for(let i=0;i<s.length;i++){ h = (h<<5) - h + s.charCodeAt(i); h |= 0; }
   return Math.abs(h);
 }
-function drugForDate(dateStr){
+// Each date's drug is decided ONCE and locked in permanently via Firestore,
+// rather than recalculated live from (hash % DRUGS.length) -- that live
+// calculation is only used as (a) the value written the very first time a
+// date is ever requested by anyone, and (b) a fallback if Firestore is
+// unavailable (offline, not configured, rules misconfigured, etc.), in which
+// case stability across future pool growth can't be guaranteed for that
+// session, but the game still works.
+function computeLiveHashDrug(dateStr){
+  const idx = hashStr(dateStr) % DRUGS.length;
+  return DRUGS[idx];
+}
+async function drugForDate(dateStr){
   const overrideName = DATE_OVERRIDES[dateStr];
   if(overrideName){
     const override = DRUGS.find(d => d.name === overrideName);
     if(override) return override;
   }
-  const idx = hashStr(dateStr) % DRUGS.length;
-  return DRUGS[idx];
+
+  if(window.rxordleDb){
+    try{
+      const docRef = window.rxordleDb.collection('dailyAssignments').doc(dateStr);
+      const assignedName = await window.rxordleDb.runTransaction(async (tx) => {
+        const snap = await tx.get(docRef);
+        if(snap.exists && snap.data() && snap.data().drugName){
+          return snap.data().drugName;
+        }
+        // First time this date has ever been requested by anyone: pick a
+        // drug from the current pool and permanently lock it in.
+        const chosen = computeLiveHashDrug(dateStr);
+        tx.set(docRef, { drugName: chosen.name, assignedAt: new Date().toISOString() });
+        return chosen.name;
+      });
+      const assignedDrug = DRUGS.find(d => d.name === assignedName);
+      if(assignedDrug) return assignedDrug;
+      // The stored name doesn't match any current drug (e.g. it was renamed
+      // or removed from the pool) -- fall through to the live fallback below.
+    }catch(e){
+      console.warn('Could not read/write stable daily assignment from Firestore; falling back to live hash for this session.', e);
+    }
+  }
+
+  return computeLiveHashDrug(dateStr);
 }
 // Manual overrides for specific dates, e.g. to avoid a repeat or swap in a
 // different therapeutic area. Keys are 'YYYY-MM-DD', values must exactly
@@ -4055,7 +4089,7 @@ const ARCHIVE_DAYS = 30; // how many past days to list in the archive
 // ---------- Active game context ----------
 let ctx = {
   date: TODAY,
-  drug: drugForDate(TODAY),
+  drug: null, // resolved asynchronously by loadGame(TODAY) before any render happens
   state: { date: TODAY, guesses: [], status: 'playing' },
   practice: false,
   practiceState: null
@@ -4065,7 +4099,7 @@ function storageKeyFor(dateStr){ return 'rxordle-state-' + dateStr; }
 
 async function loadGame(dateStr){
   ctx.date = dateStr;
-  ctx.drug = drugForDate(dateStr);
+  ctx.drug = await drugForDate(dateStr);
   ctx.state = { date: dateStr, guesses: [], status: 'playing', statsRecorded: false };
   ctx.practice = false;
   ctx.practiceState = null;
@@ -4657,6 +4691,7 @@ document.addEventListener('click', (e) => {
 guessBtn.addEventListener('click', submitGuess);
 
 function submitGuess(){
+  if(!ctx.drug) return; // initial daily assignment still loading
   const st = activeState();
   if(st.status !== 'playing') return;
   const raw = guessInput.value.trim();

@@ -509,6 +509,19 @@
     border-radius:20px;
   }
 
+  /* Percentile */
+  .percentile-line{
+    margin:0.7rem 0 0;
+    text-align:center;
+    font-size:0.88rem;
+    font-weight:600;
+    color:#8A5B00;
+    background:#FFF7E0;
+    border:1px solid #F0DBA6;
+    border-radius:10px;
+    padding:0.6rem 0.8rem;
+  }
+
   /* Learn more */
   .learnmore-btn{
     margin-top:0.9rem;
@@ -761,6 +774,7 @@
     <h3 id="modalTitle"></h3>
     <p id="modalSub"></p>
     <div id="modalShareWrap"></div>
+    <p id="modalPercentileWrap" class="percentile-line" style="display:none;"></p>
     <div id="modalLearnMoreWrap"></div>
     <button class="modal-continue" id="modalContinue">Continue</button>
   </div>
@@ -768,6 +782,31 @@
 
 <div class="toast" id="toast"></div>
 <div class="confetti-container" id="confettiContainer"></div>
+
+<!-- Firebase (used only for the cross-player daily percentile feature).
+     Replace firebaseConfig below with your own project's config from
+     Firebase Console -> Project Settings -> General -> Your apps -> Web app.
+     If this config is left as placeholders, the percentile feature simply
+     stays hidden -- nothing else in the game depends on it. -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  window.rxordleDb = null;
+  try{
+    if(firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY"){
+      firebase.initializeApp(firebaseConfig);
+      window.rxordleDb = firebase.firestore();
+    }
+  }catch(e){ console.warn('Firebase not configured; percentile feature disabled.', e); }
+</script>
 
 <script>
 const DRUGS = [
@@ -2793,7 +2832,1057 @@ const DRUGS = [
     "It works by inhibiting carbonic anhydrase in the eye, reducing aqueous humor production.",
     "A bitter taste in the mouth and eye stinging are commonly reported.",
     "It is the topical eye-drop version of a mechanism also used by an oral medication for altitude sickness and other conditions.",
-    "It is often combined with timolol in a single glaucoma eye drop for patients needing more than one class of therapy." ]}
+    "It is often combined with timolol in a single glaucoma eye drop for patients needing more than one class of therapy." ]},
+  { name:"Sacubitril-valsartan", cls:"Angiotensin receptor-neprilysin inhibitor (ARNI)", clues:[
+    "This medication is prescribed to a patient with heart failure with reduced ejection fraction.",
+    "It belongs to a combination class known as an angiotensin receptor-neprilysin inhibitor.",
+    "It works by blocking the angiotensin receptor while also inhibiting neprilysin, boosting protective natriuretic peptides.",
+    "Hypotension and angioedema are notable risks.",
+    "It requires a 36-hour washout period after stopping an ACE inhibitor before starting, to avoid a dangerous overlap.",
+    "It is sold under the brand name Entresto and represented a major shift in heart failure treatment guidelines." ]},
+  { name:"Alteplase", cls:"Tissue plasminogen activator (thrombolytic)", clues:[
+    "This medication is used for a patient with an acute ischemic stroke or massive pulmonary embolism.",
+    "It belongs to the tissue plasminogen activator, or thrombolytic, class.",
+    "It works by converting plasminogen to plasmin, breaking down fibrin clots.",
+    "Serious bleeding, including intracranial hemorrhage, is the primary risk.",
+    "Its benefit in stroke is highly time-dependent, generally given within a narrow window from symptom onset.",
+    "It is often referred to simply as 'tPA' and its use requires strict exclusion criteria to minimize bleeding risk." ]},
+  { name:"Tenecteplase", cls:"Tissue plasminogen activator (thrombolytic)", clues:[
+    "This medication is used for a patient with an acute ST-elevation heart attack or ischemic stroke.",
+    "It belongs to the tissue plasminogen activator, or thrombolytic, class.",
+    "It works by converting plasminogen to plasmin, breaking down fibrin clots.",
+    "Serious bleeding, including intracranial hemorrhage, is the primary risk.",
+    "It can be given as a single rapid IV bolus, unlike an older thrombolytic requiring a continuous infusion.",
+    "Its simpler dosing has made it increasingly preferred over an older, infusion-based thrombolytic for stroke." ]},
+  { name:"Eptifibatide", cls:"Glycoprotein IIb/IIIa inhibitor", clues:[
+    "This medication is used for a patient with acute coronary syndrome undergoing catheterization.",
+    "It belongs to the glycoprotein IIb/IIIa inhibitor antiplatelet class.",
+    "It works by blocking the final common pathway of platelet aggregation.",
+    "Bleeding and thrombocytopenia are notable risks.",
+    "It is given as a continuous IV infusion, typically in the setting of a cardiac catheterization lab.",
+    "It requires dose adjustment for kidney function and is reserved for high-risk acute coronary procedures." ]},
+  { name:"Tirofiban", cls:"Glycoprotein IIb/IIIa inhibitor", clues:[
+    "This medication is used for a patient with acute coronary syndrome undergoing catheterization.",
+    "It belongs to the glycoprotein IIb/IIIa inhibitor antiplatelet class.",
+    "It works by blocking the final common pathway of platelet aggregation.",
+    "Bleeding and thrombocytopenia are notable risks.",
+    "It provides very potent, rapid platelet inhibition, reserved for high-risk short-term use.",
+    "It is given as an IV infusion in the cardiac catheterization lab alongside other antiplatelet therapy." ]},
+  { name:"Argatroban", cls:"Direct thrombin inhibitor", clues:[
+    "This medication is used for a patient with heparin-induced thrombocytopenia needing anticoagulation.",
+    "It belongs to the direct thrombin inhibitor class.",
+    "It works by directly inhibiting thrombin, independent of antithrombin.",
+    "Bleeding is the primary risk.",
+    "It is specifically useful because it does not cross-react with heparin antibodies, unlike heparin itself.",
+    "It is a continuous IV infusion and requires monitoring with the aPTT rather than the anti-Xa assay used for some other anticoagulants." ]},
+  { name:"Bivalirudin", cls:"Direct thrombin inhibitor", clues:[
+    "This medication is used for a patient undergoing a cardiac catheterization procedure.",
+    "It belongs to the direct thrombin inhibitor class.",
+    "It works by directly and reversibly inhibiting thrombin.",
+    "Bleeding is the primary risk.",
+    "It is often chosen as an alternative to heparin in patients with a history of heparin-induced thrombocytopenia.",
+    "It is given as a continuous IV infusion during percutaneous coronary intervention." ]},
+  { name:"Fondaparinux", cls:"Factor Xa inhibitor (indirect, injectable)", clues:[
+    "This medication is used for a patient with venous thromboembolism or acute coronary syndrome.",
+    "It belongs to a synthetic, injectable factor Xa inhibitor class.",
+    "It works by selectively binding antithrombin, potentiating its inhibition of factor Xa.",
+    "Bleeding is the primary risk.",
+    "It is considered a safer alternative to heparin in patients with a history of heparin-induced thrombocytopenia.",
+    "It is a once-daily subcutaneous injection, a fully synthetic molecule rather than derived from animal tissue." ]},
+  { name:"Protamine sulfate", cls:"Heparin reversal agent", clues:[
+    "This medication is used for a patient with serious bleeding or overdose related to heparin therapy.",
+    "It belongs to the heparin antidote class.",
+    "It works by binding heparin, forming an inactive complex that neutralizes its anticoagulant effect.",
+    "Hypotension and, rarely, severe allergic reactions are notable risks, especially with rapid administration.",
+    "Patients previously exposed to certain insulin formulations or with fish allergies may have a higher risk of reaction.",
+    "It is given intravenously and only reverses heparin, having little effect on other anticoagulants." ]},
+  { name:"Dronedarone", cls:"Class III antiarrhythmic", clues:[
+    "This medication is prescribed to a patient with atrial fibrillation to help maintain normal heart rhythm.",
+    "It belongs to the class III antiarrhythmic class.",
+    "It works by blocking multiple cardiac ion channels, similar to an older antiarrhythmic but without iodine.",
+    "Liver injury and, in severe heart failure, increased mortality are notable risks.",
+    "It was developed as an alternative to an older antiarrhythmic to avoid that drug's thyroid and lung toxicity.",
+    "It is contraindicated in patients with permanent atrial fibrillation or severe heart failure." ]},
+  { name:"Amiloride", cls:"Potassium-sparing diuretic", clues:[
+    "This medication is used for a patient with hypertension or edema who needs a diuretic without losing potassium.",
+    "It belongs to the potassium-sparing diuretic class.",
+    "It works by blocking epithelial sodium channels in the distal nephron, independent of aldosterone.",
+    "Hyperkalemia is the primary risk.",
+    "Unlike a related class, it does not act through aldosterone receptors and causes no hormonal side effects.",
+    "It is often combined with a thiazide diuretic to offset potassium loss." ]},
+  { name:"Triamterene", cls:"Potassium-sparing diuretic", clues:[
+    "This medication is used for a patient with edema or hypertension needing a mild, potassium-sparing diuretic.",
+    "It belongs to the potassium-sparing diuretic class.",
+    "It works by blocking epithelial sodium channels in the distal nephron.",
+    "Hyperkalemia and, rarely, kidney stones are notable risks.",
+    "It is most commonly used in a fixed-dose combination with hydrochlorothiazide.",
+    "It is almost always prescribed as a combination pill rather than on its own." ]},
+  { name:"Methotrexate", cls:"Antimetabolite (DMARD)", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis, psoriasis, or certain cancers.",
+    "It belongs to the antimetabolite class, used at low doses as a disease-modifying antirheumatic drug.",
+    "It works by inhibiting dihydrofolate reductase, blocking folate metabolism needed for cell division.",
+    "Liver toxicity, bone marrow suppression, and mouth sores are notable risks.",
+    "It is typically given as a weekly, not daily, dose for autoimmune conditions, and is usually paired with folic acid supplementation.",
+    "Taking it daily by mistake, instead of weekly, is a well-known and dangerous prescribing error." ]},
+  { name:"Hydroxychloroquine", cls:"Antimalarial (DMARD)", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis or lupus.",
+    "It belongs to the antimalarial class, used as a disease-modifying antirheumatic drug.",
+    "It works by interfering with immune cell antigen processing, dampening autoimmune activity.",
+    "Retinal toxicity with long-term use is a distinctive risk, requiring periodic eye exams.",
+    "Patients require baseline and annual eye exams to screen for a specific type of retinal damage.",
+    "It gained widespread public attention as an unproven COVID-19 treatment, despite its established role in autoimmune disease." ]},
+  { name:"Sulfasalazine", cls:"Aminosalicylate (DMARD)", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis or inflammatory bowel disease.",
+    "It belongs to the aminosalicylate class, also used as a disease-modifying antirheumatic drug.",
+    "It works by combining anti-inflammatory and antibacterial components, though its exact mechanism is not fully understood.",
+    "Rash, gastrointestinal upset, and, rarely, reversible low sperm counts are notable.",
+    "It should be avoided in patients with a sulfa allergy due to its sulfonamide component.",
+    "It is broken down into two active components in the gut, giving it uses in both joint and bowel disease." ]},
+  { name:"Azathioprine", cls:"Immunosuppressant (purine analog)", clues:[
+    "This medication is used for a patient with an autoimmune condition or a transplant recipient.",
+    "It belongs to the purine analog immunosuppressant class.",
+    "It works by inhibiting purine synthesis, suppressing rapidly dividing immune cells.",
+    "Bone marrow suppression and increased infection risk are notable.",
+    "Genetic testing for an enzyme called TPMT is often done before starting, since deficiency raises toxicity risk.",
+    "It requires regular blood count monitoring due to its bone marrow suppressive effects." ]},
+  { name:"Mycophenolate mofetil", cls:"Immunosuppressant", clues:[
+    "This medication is used for a transplant recipient or a patient with lupus nephritis.",
+    "It belongs to the immunosuppressant class.",
+    "It works by inhibiting an enzyme needed for lymphocyte proliferation.",
+    "Gastrointestinal upset and increased infection risk are notable.",
+    "It is highly teratogenic and requires strict pregnancy prevention counseling in women of childbearing age.",
+    "It is a cornerstone immunosuppressant in solid organ transplantation, usually combined with other agents." ]},
+  { name:"Cyclosporine", cls:"Calcineurin inhibitor", clues:[
+    "This medication is used for a transplant recipient or a patient with severe psoriasis or rheumatoid arthritis.",
+    "It belongs to the calcineurin inhibitor immunosuppressant class.",
+    "It works by inhibiting calcineurin, blocking T-cell activation.",
+    "Kidney toxicity and hypertension are notable risks.",
+    "It has a narrow therapeutic index and numerous drug interactions, requiring blood level monitoring.",
+    "It was one of the first calcineurin inhibitors, revolutionizing organ transplant success rates when introduced." ]},
+  { name:"Tacrolimus", cls:"Calcineurin inhibitor", clues:[
+    "This medication is used for a transplant recipient to prevent organ rejection.",
+    "It belongs to the calcineurin inhibitor immunosuppressant class.",
+    "It works by inhibiting calcineurin, blocking T-cell activation, though structurally distinct from a related drug.",
+    "Kidney toxicity, tremor, and elevated blood glucose are notable risks.",
+    "It has largely replaced an older calcineurin inhibitor as the backbone immunosuppressant in most transplant regimens.",
+    "It requires therapeutic drug level monitoring and is also available as a topical ointment for eczema." ]},
+  { name:"Sirolimus", cls:"mTOR inhibitor", clues:[
+    "This medication is used for a transplant recipient, often to allow lower doses of other immunosuppressants.",
+    "It belongs to the mTOR inhibitor immunosuppressant class.",
+    "It works by inhibiting the mTOR pathway, blocking a key step in T-cell proliferation.",
+    "Impaired wound healing and elevated lipids are notable risks.",
+    "Unlike calcineurin inhibitors, it is not directly toxic to the kidneys, making it useful when kidney function is a concern.",
+    "It is also used, in a different formulation, as a coating on certain cardiac stents." ]},
+  { name:"Etanercept", cls:"TNF inhibitor biologic", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis or psoriasis not controlled by conventional therapy.",
+    "It belongs to the tumor necrosis factor (TNF) inhibitor biologic class.",
+    "It works as a soluble receptor that binds and neutralizes TNF-alpha.",
+    "Increased infection risk, including reactivation of latent tuberculosis, is a key concern.",
+    "Unlike an antibody-based TNF inhibitor, it is a fusion protein combining a TNF receptor with an antibody fragment.",
+    "It is given as a weekly subcutaneous injection and is sold under the brand name Enbrel." ]},
+  { name:"Certolizumab", cls:"TNF inhibitor biologic", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis or Crohn disease not controlled by conventional therapy.",
+    "It belongs to the tumor necrosis factor (TNF) inhibitor biologic class.",
+    "It works by binding and neutralizing TNF-alpha.",
+    "Increased infection risk is a key concern.",
+    "It lacks the Fc portion found in most antibody-based biologics, which may reduce placental transfer during pregnancy.",
+    "It is sold under the brand name Cimzia and is considered a preferred TNF inhibitor option during pregnancy." ]},
+  { name:"Golimumab", cls:"TNF inhibitor biologic", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis, psoriatic arthritis, or ulcerative colitis.",
+    "It belongs to the tumor necrosis factor (TNF) inhibitor biologic class.",
+    "It works by binding and neutralizing TNF-alpha.",
+    "Increased infection risk is a key concern.",
+    "It is given as a once-monthly subcutaneous injection, less frequent than several other TNF inhibitors.",
+    "It is sold under the brand name Simponi." ]},
+  { name:"Ustekinumab", cls:"IL-12/23 inhibitor biologic", clues:[
+    "This medication is prescribed to a patient with moderate to severe psoriasis, psoriatic arthritis, or Crohn disease.",
+    "It belongs to the interleukin-12/23 inhibitor biologic class.",
+    "It works by binding a shared subunit of interleukin-12 and interleukin-23, blocking their inflammatory signaling.",
+    "Increased infection risk is a key concern, though generally lower than with TNF inhibitors.",
+    "Its dosing interval can be as infrequent as every twelve weeks after an initial loading phase.",
+    "It is sold under the brand name Stelara." ]},
+  { name:"Secukinumab", cls:"IL-17A inhibitor biologic", clues:[
+    "This medication is prescribed to a patient with moderate to severe psoriasis, psoriatic arthritis, or ankylosing spondylitis.",
+    "It belongs to the interleukin-17A inhibitor biologic class.",
+    "It works by binding and neutralizing interleukin-17A, a key driver of psoriatic inflammation.",
+    "Increased infection risk and worsening of inflammatory bowel disease are notable.",
+    "It should be used cautiously in patients with a history of inflammatory bowel disease, which it can worsen.",
+    "It is sold under the brand name Cosentyx." ]},
+  { name:"Tofacitinib", cls:"JAK inhibitor", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis or ulcerative colitis not controlled by other therapies.",
+    "It belongs to the Janus kinase (JAK) inhibitor class.",
+    "It works by inhibiting JAK enzymes, blocking multiple inflammatory cytokine signaling pathways.",
+    "Increased risk of blood clots, cardiovascular events, and certain cancers are notable, per a boxed warning.",
+    "It carries a boxed warning based on a large safety trial comparing it to TNF inhibitors in higher-risk patients.",
+    "Unlike biologics, it is taken as an oral tablet rather than by injection." ]},
+  { name:"Baricitinib", cls:"JAK inhibitor", clues:[
+    "This medication is prescribed to a patient with rheumatoid arthritis or severe alopecia areata.",
+    "It belongs to the Janus kinase (JAK) inhibitor class.",
+    "It works by inhibiting JAK1 and JAK2 enzymes, blocking inflammatory cytokine signaling.",
+    "Increased risk of blood clots and infection are notable, per a boxed warning shared across its drug class.",
+    "It was also used during the COVID-19 pandemic for its anti-inflammatory effects in severe respiratory illness.",
+    "It is taken as a once-daily oral tablet." ]},
+  { name:"Tamoxifen", cls:"Selective estrogen receptor modulator", clues:[
+    "This medication is prescribed to a patient with hormone-receptor-positive breast cancer.",
+    "It belongs to the selective estrogen receptor modulator class.",
+    "It works by blocking estrogen receptors in breast tissue while having estrogen-like effects elsewhere in the body.",
+    "Hot flashes and, rarely, uterine cancer or blood clots are notable risks.",
+    "It can be used in both premenopausal and postmenopausal women, unlike aromatase inhibitors.",
+    "Its mixed estrogen-blocking and estrogen-like effects in different tissues is what makes it a 'selective' modulator." ]},
+  { name:"Anastrozole", cls:"Aromatase inhibitor", clues:[
+    "This medication is prescribed to a postmenopausal woman with hormone-receptor-positive breast cancer.",
+    "It belongs to the aromatase inhibitor class.",
+    "It works by blocking the aromatase enzyme, reducing peripheral estrogen production.",
+    "Joint pain and accelerated bone density loss are notable risks.",
+    "It is only effective in postmenopausal women, since premenopausal ovaries produce estrogen through a different pathway.",
+    "Bone density monitoring is recommended during treatment due to its estrogen-depleting effect on bone." ]},
+  { name:"Cyclophosphamide", cls:"Alkylating agent (chemotherapy)", clues:[
+    "This medication is used for a patient with certain cancers or severe autoimmune disease such as lupus nephritis.",
+    "It belongs to the alkylating agent chemotherapy class.",
+    "It works by cross-linking DNA strands, preventing cell replication.",
+    "Bone marrow suppression and hemorrhagic cystitis are notable risks.",
+    "A specific bladder-protective medication is often given alongside it to prevent bladder toxicity.",
+    "Beyond cancer, it is also used at lower doses for severe autoimmune conditions affecting the kidneys." ]},
+  { name:"Doxorubicin", cls:"Anthracycline (chemotherapy)", clues:[
+    "This medication is used for a patient with certain cancers, including breast cancer and lymphoma.",
+    "It belongs to the anthracycline chemotherapy class.",
+    "It works by intercalating into DNA and inhibiting topoisomerase II, disrupting DNA replication.",
+    "Bone marrow suppression and, distinctively, cumulative dose-dependent heart damage are notable risks.",
+    "Lifetime cumulative dosing limits exist specifically because of its risk of irreversible heart failure.",
+    "It is nicknamed the 'red devil' by some due to its red color and potent side effects." ]},
+  { name:"Paclitaxel", cls:"Taxane (chemotherapy)", clues:[
+    "This medication is used for a patient with breast, ovarian, or lung cancer.",
+    "It belongs to the taxane chemotherapy class.",
+    "It works by stabilizing microtubules, preventing cell division.",
+    "Peripheral neuropathy and hypersensitivity reactions are notable risks.",
+    "Patients are premedicated with steroids and antihistamines to reduce the risk of an infusion reaction.",
+    "It was originally derived from the bark of the Pacific yew tree." ]},
+  { name:"Cisplatin", cls:"Platinum-based chemotherapy", clues:[
+    "This medication is used for a patient with various solid tumors, including testicular and bladder cancer.",
+    "It belongs to the platinum-based chemotherapy class.",
+    "It works by cross-linking DNA strands, similar to alkylating agents, preventing replication.",
+    "Kidney toxicity and nausea are prominent risks, requiring aggressive IV hydration around treatment.",
+    "Aggressive hydration protocols are used specifically to protect the kidneys during administration.",
+    "It transformed testicular cancer from a frequently fatal disease into one with very high cure rates." ]},
+  { name:"Carboplatin", cls:"Platinum-based chemotherapy", clues:[
+    "This medication is used for a patient with ovarian, lung, or other solid tumors.",
+    "It belongs to the platinum-based chemotherapy class.",
+    "It works by cross-linking DNA strands, preventing replication.",
+    "Bone marrow suppression, particularly low platelets, is a prominent risk.",
+    "It causes less kidney toxicity and nausea than a related platinum chemotherapy, making it more tolerable for some regimens.",
+    "Its dosing is uniquely calculated using kidney function through a formula called the Calvert equation." ]},
+  { name:"Fluorouracil", cls:"Antimetabolite (chemotherapy)", clues:[
+    "This medication is used for a patient with colorectal or other gastrointestinal cancers, or topically for certain skin lesions.",
+    "It belongs to the antimetabolite chemotherapy class.",
+    "It works by inhibiting thymidylate synthase, blocking DNA synthesis.",
+    "Mucositis, diarrhea, and bone marrow suppression are notable risks.",
+    "A genetic enzyme deficiency called DPD deficiency can cause severe, even fatal, toxicity in some patients.",
+    "It is also used as a topical cream for precancerous skin lesions, distinct from its intravenous chemotherapy use." ]},
+  { name:"Imatinib", cls:"Tyrosine kinase inhibitor", clues:[
+    "This medication is prescribed to a patient with chronic myeloid leukemia or certain gastrointestinal tumors.",
+    "It belongs to the tyrosine kinase inhibitor class.",
+    "It works by inhibiting the BCR-ABL fusion protein, a specific driver of leukemic cell growth.",
+    "Fluid retention and gastrointestinal upset are commonly reported.",
+    "It was one of the first targeted cancer therapies, transforming chronic myeloid leukemia into a manageable chronic disease.",
+    "It specifically targets a genetic abnormality called the Philadelphia chromosome." ]},
+  { name:"Rituximab", cls:"Anti-CD20 monoclonal antibody", clues:[
+    "This medication is used for a patient with certain B-cell lymphomas or rheumatoid arthritis.",
+    "It belongs to the anti-CD20 monoclonal antibody biologic class.",
+    "It works by binding CD20 on B-cells, marking them for immune destruction.",
+    "Infusion reactions and increased infection risk are notable.",
+    "It causes profound depletion of B-cells, which is useful in both certain cancers and autoimmune disease.",
+    "It was one of the first monoclonal antibodies approved for cancer treatment and remains widely used." ]},
+  { name:"Trastuzumab", cls:"Anti-HER2 monoclonal antibody", clues:[
+    "This medication is prescribed to a patient with HER2-positive breast cancer.",
+    "It belongs to the anti-HER2 monoclonal antibody biologic class.",
+    "It works by binding the HER2 receptor, blocking growth signaling in HER2-positive cancer cells.",
+    "Cardiotoxicity is a distinctive risk, requiring monitoring of heart function during treatment.",
+    "Testing a tumor for HER2 status is required before starting, since it is only effective in HER2-positive cancer.",
+    "It dramatically improved outcomes specifically for the subset of breast cancers that overexpress the HER2 protein." ]},
+  { name:"Bevacizumab", cls:"Anti-VEGF monoclonal antibody", clues:[
+    "This medication is used for a patient with certain cancers, including colorectal and lung cancer.",
+    "It belongs to the anti-VEGF monoclonal antibody biologic class.",
+    "It works by binding VEGF, blocking new blood vessel formation that tumors need to grow.",
+    "Hypertension, bleeding, and impaired wound healing are notable risks.",
+    "Its blood-vessel-blocking mechanism means it is typically held for several weeks before and after surgery.",
+    "It is also used, at a much lower dose, as an injection into the eye for certain retinal diseases." ]},
+  { name:"Pembrolizumab", cls:"PD-1 checkpoint inhibitor", clues:[
+    "This medication is used for a patient with various advanced cancers, including melanoma and lung cancer.",
+    "It belongs to the PD-1 checkpoint inhibitor immunotherapy class.",
+    "It works by blocking the PD-1 receptor on T-cells, releasing a brake on the immune system's attack on cancer.",
+    "Immune-related side effects, such as colitis, pneumonitis, or thyroid dysfunction, are distinctive risks.",
+    "Its side effects arise from an overactivated immune system attacking normal tissue, unlike the direct cell toxicity of chemotherapy.",
+    "It represents a class of cancer immunotherapy that helped usher in a new era of treatment beyond traditional chemotherapy." ]},
+  { name:"Nivolumab", cls:"PD-1 checkpoint inhibitor", clues:[
+    "This medication is used for a patient with various advanced cancers, including melanoma, lung cancer, and kidney cancer.",
+    "It belongs to the PD-1 checkpoint inhibitor immunotherapy class.",
+    "It works by blocking the PD-1 receptor on T-cells, releasing a brake on the immune system's attack on cancer.",
+    "Immune-related side effects, such as colitis, pneumonitis, or hepatitis, are distinctive risks.",
+    "It is often combined with a CTLA-4 inhibitor for certain cancers to boost immune activation further.",
+    "It is given as an IV infusion and belongs to the same class of checkpoint inhibitors that transformed cancer immunotherapy." ]},
+  { name:"Leuprolide", cls:"GnRH agonist", clues:[
+    "This medication is used for a patient with prostate cancer, endometriosis, or precocious puberty.",
+    "It belongs to the GnRH agonist class.",
+    "It works by initially stimulating, then paradoxically suppressing, pituitary gonadotropin release with continuous use.",
+    "Hot flashes and bone density loss are notable, reflecting the low-hormone state it induces.",
+    "It can cause a temporary 'flare' of symptoms when first started, before its suppressive effect takes hold.",
+    "It is given as a long-acting depot injection, achieving a form of reversible medical castration in prostate cancer." ]},
+  { name:"Bicalutamide", cls:"Antiandrogen", clues:[
+    "This medication is prescribed to a man with prostate cancer, often alongside a GnRH agonist.",
+    "It belongs to the antiandrogen class.",
+    "It works by blocking androgen receptors, preventing testosterone from stimulating prostate cancer cell growth.",
+    "Gynecomastia and hot flashes are notable side effects.",
+    "It is typically started alongside a GnRH agonist to blunt the initial testosterone flare that agonist can cause.",
+    "It works downstream of testosterone production, blocking its effect rather than lowering its level." ]},
+  { name:"Abiraterone", cls:"Androgen synthesis inhibitor", clues:[
+    "This medication is prescribed to a man with metastatic prostate cancer.",
+    "It belongs to the androgen synthesis inhibitor class.",
+    "It works by inhibiting an enzyme needed for androgen production in the testes, adrenal glands, and tumor tissue itself.",
+    "Fluid retention, hypertension, and liver enzyme elevation are notable.",
+    "It must be taken with a low-dose steroid to prevent a hormonal imbalance caused by its mechanism.",
+    "It blocks androgen production at a step further upstream than drugs that simply block the androgen receptor." ]},
+  { name:"Enzalutamide", cls:"Androgen receptor inhibitor", clues:[
+    "This medication is prescribed to a man with metastatic prostate cancer.",
+    "It belongs to the androgen receptor inhibitor class.",
+    "It works by potently blocking the androgen receptor, more completely than older antiandrogens.",
+    "Fatigue and, rarely, seizures are notable risks.",
+    "It is used for prostate cancer that has progressed despite standard hormone-suppressing therapy.",
+    "It offers more complete androgen receptor blockade than older antiandrogens used earlier in prostate cancer treatment." ]},
+  { name:"Vedolizumab", cls:"Integrin receptor antagonist biologic", clues:[
+    "This medication is prescribed to a patient with ulcerative colitis or Crohn disease not controlled by conventional therapy.",
+    "It belongs to the integrin receptor antagonist biologic class.",
+    "It works by blocking gut-specific integrins, preventing inflammatory cells from migrating into intestinal tissue.",
+    "Infection risk is present but lower than with systemically acting biologics, due to its gut-selective action.",
+    "Its gut-selective mechanism gives it a favorable safety profile compared to systemically acting biologics.",
+    "It is given as an IV infusion and is sold under the brand name Entyvio." ]},
+  { name:"Alosetron", cls:"5-HT3 receptor antagonist (gut-selective)", clues:[
+    "This medication is prescribed to a woman with severe irritable bowel syndrome with diarrhea.",
+    "It belongs to the 5-HT3 receptor antagonist class, acting in the gut.",
+    "It works by blocking serotonin 5-HT3 receptors in the gastrointestinal tract, slowing colonic transit.",
+    "Severe constipation and, rarely, ischemic colitis are notable risks.",
+    "It is available only through a restricted prescribing program due to its risk of ischemic colitis.",
+    "It is reserved for severe cases that have failed other treatments, due to its restricted access program." ]},
+  { name:"Eluxadoline", cls:"Mixed opioid receptor agonist/antagonist (gut-selective)", clues:[
+    "This medication is prescribed to a patient with irritable bowel syndrome with diarrhea.",
+    "It belongs to a gut-selective mixed opioid receptor agonist and antagonist class.",
+    "It works by modulating opioid receptors in the gut to reduce diarrhea and abdominal pain.",
+    "Constipation and, rarely, pancreatitis are notable risks.",
+    "It is contraindicated in patients without a gallbladder due to increased pancreatitis risk.",
+    "It combines opioid-like gut effects with an antagonist component intended to limit central nervous system activity." ]},
+  { name:"Lubiprostone", cls:"Chloride channel activator", clues:[
+    "This medication is prescribed to a patient with chronic constipation or constipation-predominant irritable bowel syndrome.",
+    "It belongs to the chloride channel activator class.",
+    "It works by activating intestinal chloride channels, increasing fluid secretion into the bowel.",
+    "Nausea is a commonly reported side effect, especially when taken without food.",
+    "Taking it with food and water can reduce its most common side effect of nausea.",
+    "It is one of the few laxatives that works through a specific chloride channel mechanism rather than osmotic or stimulant effects." ]},
+  { name:"Linaclotide", cls:"Guanylate cyclase-C agonist", clues:[
+    "This medication is prescribed to a patient with chronic constipation or constipation-predominant irritable bowel syndrome.",
+    "It belongs to the guanylate cyclase-C agonist class.",
+    "It works by activating guanylate cyclase-C receptors in the gut, increasing fluid secretion and easing pain signaling.",
+    "Diarrhea is the most common side effect.",
+    "It is taken on an empty stomach, since taking it with food can worsen diarrhea.",
+    "It also has a pain-modulating effect in the gut, distinct from purely mechanical laxative effects." ]},
+  { name:"Prucalopride", cls:"Serotonin 5-HT4 receptor agonist (prokinetic)", clues:[
+    "This medication is prescribed to a patient with chronic constipation not responsive to other treatments.",
+    "It belongs to the serotonin 5-HT4 receptor agonist prokinetic class.",
+    "It works by stimulating 5-HT4 receptors in the gut, enhancing colonic motility.",
+    "Headache and abdominal pain are commonly reported.",
+    "It directly stimulates gut motility rather than simply softening or bulking the stool.",
+    "It represents a newer generation of prokinetic drugs developed after older 5-HT4 agonists were withdrawn for cardiac safety concerns." ]},
+  { name:"Aclidinium", cls:"Long-acting muscarinic antagonist (LAMA)", clues:[
+    "This medication is prescribed to a patient with COPD for daily maintenance.",
+    "It belongs to the long-acting muscarinic antagonist (LAMA) class.",
+    "It works by blocking muscarinic receptors in the airways, causing sustained bronchodilation.",
+    "Dry mouth is a commonly reported side effect.",
+    "It is taken twice daily, unlike some other long-acting muscarinic antagonists dosed once daily.",
+    "It is sold under the brand name Tudorza." ]},
+  { name:"Glycopyrrolate", cls:"Anticholinergic (antimuscarinic)", clues:[
+    "This medication is used for a patient with COPD, excessive drooling, or excessive secretions during anesthesia.",
+    "It belongs to the anticholinergic antimuscarinic class.",
+    "It works by blocking muscarinic receptors, reducing secretions and, in inhaled form, causing bronchodilation.",
+    "Dry mouth and constipation are commonly reported.",
+    "Unlike atropine, it does not cross the blood-brain barrier, avoiding central nervous system side effects.",
+    "It is used in very different settings, from an inhaler for COPD to an injectable drying agent before surgery." ]},
+  { name:"Benralizumab", cls:"Anti-IL-5 receptor biologic", clues:[
+    "This medication is prescribed to a patient with severe eosinophilic asthma.",
+    "It belongs to the anti-interleukin-5 receptor biologic class.",
+    "It works by binding the IL-5 receptor on eosinophils, triggering their depletion.",
+    "Headache and injection site reactions are commonly reported.",
+    "It nearly eliminates circulating eosinophils, distinguishing it from biologics that simply neutralize the cytokine itself.",
+    "It is given as a subcutaneous injection, initially monthly and then extended to every eight weeks." ]},
+  { name:"Mepolizumab", cls:"Anti-IL-5 biologic", clues:[
+    "This medication is prescribed to a patient with severe eosinophilic asthma.",
+    "It belongs to the anti-interleukin-5 biologic class.",
+    "It works by neutralizing interleukin-5, reducing eosinophil production and survival.",
+    "Headache and injection site reactions are commonly reported.",
+    "It is one of the first biologics developed specifically targeting the eosinophilic pathway in severe asthma.",
+    "It is given as a subcutaneous injection, typically once every four weeks." ]},
+  { name:"Omalizumab", cls:"Anti-IgE biologic", clues:[
+    "This medication is prescribed to a patient with moderate to severe allergic asthma or chronic hives.",
+    "It belongs to the anti-IgE biologic class.",
+    "It works by binding free IgE antibody, preventing it from triggering allergic inflammatory cascades.",
+    "Injection site reactions and, rarely, anaphylaxis are notable.",
+    "Its dose is calculated based on both body weight and baseline IgE level, unlike most other biologics.",
+    "It was one of the first biologics approved for asthma, targeting the allergic antibody pathway directly." ]},
+  { name:"Dupilumab", cls:"Anti-IL-4/13 receptor biologic", clues:[
+    "This medication is prescribed to a patient with moderate to severe eczema, asthma, or chronic sinusitis with nasal polyps.",
+    "It belongs to the anti-interleukin-4/13 receptor biologic class.",
+    "It works by blocking a shared receptor component for interleukin-4 and interleukin-13, key drivers of type 2 inflammation.",
+    "Conjunctivitis is a distinctive side effect, particularly when used for eczema.",
+    "It is notable for treating a wide range of allergic conditions through one shared inflammatory pathway.",
+    "It is given as a subcutaneous injection and is sold under the brand name Dupixent." ]},
+  { name:"Acetylcysteine", cls:"Mucolytic / acetaminophen antidote", clues:[
+    "This medication is used for a patient with thick respiratory secretions, or for one who has taken an acetaminophen overdose.",
+    "It belongs to the mucolytic class, and separately serves as a specific antidote.",
+    "It works by breaking disulfide bonds in mucus to thin secretions, and by replenishing glutathione to prevent liver injury in overdose.",
+    "Nausea and, with IV use, anaphylactoid reactions are notable.",
+    "It is the specific antidote for acetaminophen toxicity, most effective when given within eight to ten hours of ingestion.",
+    "It has two very different uses: an inhaled mucus thinner and a critical antidote for a common overdose." ]},
+  { name:"Somatropin", cls:"Recombinant growth hormone", clues:[
+    "This medication is prescribed to a child with growth hormone deficiency, or an adult with certain wasting conditions.",
+    "It belongs to the recombinant human growth hormone class.",
+    "It works by replacing deficient growth hormone, stimulating growth and metabolic effects.",
+    "Joint pain and, in children, a risk of slipped growth plates are notable.",
+    "It is given as a daily subcutaneous injection, often over years during a child's growth period.",
+    "It is a bioengineered, identical copy of the body's own growth hormone." ]},
+  { name:"Cabergoline", cls:"Dopamine agonist", clues:[
+    "This medication is prescribed to a patient with a prolactin-secreting pituitary tumor.",
+    "It belongs to the dopamine agonist class.",
+    "It works by stimulating dopamine receptors, which suppress prolactin secretion from the pituitary.",
+    "Nausea and, rarely, heart valve changes with long-term high-dose use are notable.",
+    "It has a much longer duration of action than an older dopamine agonist, allowing twice-weekly dosing.",
+    "It is often effective enough to shrink certain pituitary tumors without requiring surgery." ]},
+  { name:"Bromocriptine", cls:"Dopamine agonist", clues:[
+    "This medication is prescribed to a patient with a prolactin-secreting pituitary tumor, or used off-label for type 2 diabetes.",
+    "It belongs to the dopamine agonist class.",
+    "It works by stimulating dopamine receptors, suppressing prolactin secretion.",
+    "Nausea and orthostatic hypotension are commonly reported.",
+    "A specialized, quick-release formulation is separately approved for improving glucose control in type 2 diabetes.",
+    "It was one of the first dopamine agonists used for prolactin-secreting pituitary tumors." ]},
+  { name:"Denosumab", cls:"RANKL inhibitor biologic", clues:[
+    "This medication is prescribed to a postmenopausal woman with osteoporosis, or a patient with bone metastases.",
+    "It belongs to the RANKL inhibitor biologic class.",
+    "It works by binding RANKL, inhibiting osteoclast formation and bone resorption.",
+    "Hypocalcemia and, rarely, atypical femur fractures or osteonecrosis of the jaw are notable.",
+    "Stopping it abruptly can cause a rebound increase in fracture risk, so transitioning to another bone drug is recommended.",
+    "It is given as a subcutaneous injection every six months for osteoporosis." ]},
+  { name:"Teriparatide", cls:"Parathyroid hormone analog", clues:[
+    "This medication is prescribed to a patient with severe osteoporosis at high fracture risk.",
+    "It belongs to the parathyroid hormone analog class.",
+    "It works by intermittently stimulating osteoblasts, promoting new bone formation.",
+    "Leg cramps and, in animal studies, a theoretical risk of a bone cancer are notable.",
+    "Unlike most osteoporosis drugs which slow bone breakdown, it actively builds new bone.",
+    "Its use is generally limited to a maximum of two years due to safety data limitations beyond that duration." ]},
+  { name:"Raloxifene", cls:"Selective estrogen receptor modulator", clues:[
+    "This medication is prescribed to a postmenopausal woman with osteoporosis, or for breast cancer risk reduction.",
+    "It belongs to the selective estrogen receptor modulator class.",
+    "It works by having estrogen-like effects on bone while blocking estrogen receptors in breast tissue.",
+    "Hot flashes and increased risk of blood clots are notable.",
+    "Its tissue-selective effects give it a bone-protective benefit without the increased uterine cancer risk seen with some other agents in its class.",
+    "It reduces the risk of invasive breast cancer while simultaneously helping to protect bone density." ]},
+  { name:"Cholecalciferol", cls:"Vitamin D supplement", clues:[
+    "This medication is prescribed to a patient with vitamin D deficiency.",
+    "It belongs to the vitamin D3 supplement class.",
+    "It works by replenishing vitamin D, which is then activated by the liver and kidney to support calcium absorption.",
+    "It is generally very well tolerated, with hypercalcemia occurring only at excessive doses.",
+    "It requires two separate activation steps in the body, unlike a fully active vitamin D analog used in kidney disease.",
+    "It is widely available over the counter and is the most common form of vitamin D supplementation." ]},
+  { name:"Vortioxetine", cls:"Atypical antidepressant", clues:[
+    "This medication is prescribed to a patient with major depressive disorder.",
+    "It belongs to the atypical antidepressant class, referred to as a serotonin modulator.",
+    "It works by inhibiting serotonin reuptake while also directly modulating several serotonin receptor subtypes.",
+    "Nausea is the most commonly reported side effect.",
+    "It has been studied for a possible modest benefit on cognitive symptoms of depression beyond mood alone.",
+    "It represents a newer, multimodal approach to serotonin modulation compared to standard SSRIs." ]},
+  { name:"Vilazodone", cls:"Atypical antidepressant", clues:[
+    "This medication is prescribed to a patient with major depressive disorder.",
+    "It belongs to the atypical antidepressant class, combining serotonin reuptake inhibition with partial receptor agonism.",
+    "It works by inhibiting serotonin reuptake and acting as a partial agonist at the 5-HT1A receptor.",
+    "Nausea and diarrhea are commonly reported, particularly when starting.",
+    "It must be taken with food, since absorption is significantly reduced on an empty stomach.",
+    "Its dual mechanism was designed to potentially reduce sexual side effects compared to standard SSRIs." ]},
+  { name:"Clozapine", cls:"Atypical antipsychotic", clues:[
+    "This medication is prescribed to a patient with treatment-resistant schizophrenia.",
+    "It belongs to the atypical antipsychotic class.",
+    "It works by antagonizing dopamine and serotonin receptors, among many others, with a broad receptor profile.",
+    "Agranulocytosis is a distinctive, potentially life-threatening risk requiring mandatory blood count monitoring.",
+    "It requires enrollment in a restricted monitoring program with regular blood draws due to its risk of dangerously low white blood cell counts.",
+    "It is often considered the most effective antipsychotic for treatment-resistant cases, despite its serious monitoring requirements." ]},
+  { name:"Paliperidone", cls:"Atypical antipsychotic", clues:[
+    "This medication is prescribed to a patient with schizophrenia or schizoaffective disorder.",
+    "It belongs to the atypical antipsychotic class.",
+    "It works by antagonizing dopamine D2 and serotonin 5-HT2A receptors.",
+    "Elevated prolactin and weight gain are notable risks.",
+    "It is the active metabolite of an older antipsychotic, offered as a distinct extended-release product.",
+    "It is available as a long-acting injectable given as infrequently as every three or six months." ]},
+  { name:"Lurasidone", cls:"Atypical antipsychotic", clues:[
+    "This medication is prescribed to a patient with schizophrenia or bipolar depression.",
+    "It belongs to the atypical antipsychotic class.",
+    "It works by antagonizing dopamine D2 and serotonin receptors.",
+    "Akathisia and nausea are commonly reported.",
+    "It carries a comparatively favorable metabolic side effect profile among atypical antipsychotics.",
+    "It must be taken with a meal of at least a moderate calorie count to ensure adequate absorption." ]},
+  { name:"Cariprazine", cls:"Atypical antipsychotic", clues:[
+    "This medication is prescribed to a patient with schizophrenia or bipolar disorder.",
+    "It belongs to the atypical antipsychotic class.",
+    "It works as a partial agonist at dopamine D2 and D3 receptors, with particular D3 affinity.",
+    "Akathisia is a commonly reported side effect.",
+    "It has a very long half-life due to active metabolites, allowing effects to persist even after missed doses.",
+    "Its distinctive affinity for the D3 dopamine receptor subtype sets it apart from most other antipsychotics." ]},
+  { name:"Brexpiprazole", cls:"Atypical antipsychotic", clues:[
+    "This medication is prescribed to a patient with schizophrenia or as an add-on for depression.",
+    "It belongs to the atypical antipsychotic class.",
+    "It works as a partial agonist at dopamine D2 receptors and serotonin receptors, similar to an older relative.",
+    "Weight gain and akathisia are notable side effects.",
+    "It was developed as a successor to an older partial dopamine agonist, aiming for a more favorable side effect balance.",
+    "It is used both for schizophrenia and as an add-on treatment for major depressive disorder." ]},
+  { name:"Valbenazine", cls:"VMAT2 inhibitor", clues:[
+    "This medication is prescribed to a patient with tardive dyskinesia from long-term antipsychotic use.",
+    "It belongs to the VMAT2 inhibitor class.",
+    "It works by inhibiting the vesicular monoamine transporter, reducing dopamine release involved in involuntary movements.",
+    "Sedation and akathisia are notable side effects.",
+    "It was one of the first medications specifically approved to treat tardive dyskinesia itself.",
+    "It targets the movement disorder caused by other psychiatric medications, rather than psychiatric symptoms." ]},
+  { name:"Deutetrabenazine", cls:"VMAT2 inhibitor", clues:[
+    "This medication is prescribed to a patient with tardive dyskinesia or chorea from Huntington disease.",
+    "It belongs to the VMAT2 inhibitor class.",
+    "It works by inhibiting the vesicular monoamine transporter, reducing excess dopamine signaling involved in involuntary movements.",
+    "Sedation and depression are notable side effects.",
+    "It uses a chemically modified form of an older VMAT2 inhibitor designed to last longer in the body.",
+    "It treats the abnormal movements themselves rather than the underlying psychiatric or neurologic disease." ]},
+  { name:"Amantadine", cls:"Dopaminergic / NMDA antagonist", clues:[
+    "This medication is prescribed to a patient with Parkinson disease, particularly for dyskinesias.",
+    "It belongs to a unique class with both dopaminergic and NMDA receptor antagonist activity.",
+    "It works by increasing dopamine release and blocking NMDA glutamate receptors.",
+    "Livedo reticularis, a mottled skin discoloration, and hallucinations are notable side effects.",
+    "It is specifically useful for reducing dyskinesias caused by long-term levodopa therapy.",
+    "It was originally developed as an antiviral before its antiparkinsonian effects were discovered." ]},
+  { name:"Selegiline", cls:"MAO-B inhibitor", clues:[
+    "This medication is prescribed to a patient with early Parkinson disease.",
+    "It belongs to the monoamine oxidase-B (MAO-B) inhibitor class.",
+    "It works by selectively inhibiting MAO-B, slowing the breakdown of dopamine in the brain.",
+    "Nausea and insomnia are commonly reported.",
+    "At higher, non-selective doses it can interact dangerously with certain foods and other serotonergic medications.",
+    "It is available as an oral tablet and, for depression, as a transdermal patch under a different brand name." ]},
+  { name:"Rasagiline", cls:"MAO-B inhibitor", clues:[
+    "This medication is prescribed to a patient with Parkinson disease, either alone early on or added later.",
+    "It belongs to the monoamine oxidase-B (MAO-B) inhibitor class.",
+    "It works by selectively inhibiting MAO-B, slowing dopamine breakdown in the brain.",
+    "Insomnia and, with dietary or drug interactions, hypertensive crisis are notable risks.",
+    "Patients are counseled about tyramine-containing foods and interacting medications due to its MAO-inhibiting activity.",
+    "It is taken once daily and can be used as monotherapy in early Parkinson disease." ]},
+  { name:"Entacapone", cls:"COMT inhibitor", clues:[
+    "This medication is prescribed to a patient with Parkinson disease experiencing wearing-off symptoms with levodopa.",
+    "It belongs to the COMT inhibitor class.",
+    "It works by inhibiting an enzyme that breaks down levodopa, extending its effect.",
+    "Diarrhea and harmless orange-brown urine discoloration are notable.",
+    "It has no antiparkinsonian effect on its own and must always be taken alongside levodopa.",
+    "It is often combined with carbidopa-levodopa in a single triple-combination tablet." ]},
+  { name:"Pramipexole", cls:"Dopamine agonist", clues:[
+    "This medication is prescribed to a patient with Parkinson disease or restless legs syndrome.",
+    "It belongs to the dopamine agonist class.",
+    "It works by directly stimulating dopamine receptors.",
+    "Sedation, hallucinations, and impulse control disorders such as compulsive gambling are notable risks.",
+    "Like other dopamine agonists, it carries a distinctive risk of triggering new compulsive behaviors.",
+    "It is used at lower doses for restless legs syndrome than for Parkinson disease." ]},
+  { name:"Naloxegol", cls:"Peripherally-acting mu-opioid receptor antagonist", clues:[
+    "This medication is prescribed to a patient with opioid-induced constipation from chronic non-cancer pain treatment.",
+    "It belongs to the peripherally-acting mu-opioid receptor antagonist class.",
+    "It works by blocking opioid receptors in the gut without crossing into the brain, avoiding reversal of pain relief.",
+    "Abdominal pain and diarrhea are commonly reported.",
+    "It is specifically engineered to stay out of the central nervous system, preserving the opioid's pain-relieving effect.",
+    "It treats a specific side effect of opioids without undoing their analgesic benefit." ]},
+  { name:"Methylnaltrexone", cls:"Peripherally-acting mu-opioid receptor antagonist", clues:[
+    "This medication is used for a patient with opioid-induced constipation not responding to standard laxatives.",
+    "It belongs to the peripherally-acting mu-opioid receptor antagonist class.",
+    "It works by blocking opioid receptors in the gut without crossing the blood-brain barrier.",
+    "Abdominal pain and, rarely, bowel perforation in at-risk patients are notable.",
+    "It is available as a subcutaneous injection, often used when oral options have failed.",
+    "It reverses opioid-induced constipation without reversing the opioid's central pain-relieving effect." ]},
+  { name:"Disulfiram", cls:"Aldehyde dehydrogenase inhibitor", clues:[
+    "This medication is prescribed to a patient with alcohol use disorder seeking to maintain abstinence.",
+    "It belongs to the aldehyde dehydrogenase inhibitor class.",
+    "It works by blocking alcohol metabolism, causing toxic acetaldehyde to build up if alcohol is consumed.",
+    "Flushing, nausea, and palpitations occur if alcohol is consumed while taking it.",
+    "Patients must be counseled to avoid all sources of alcohol, including certain cough syrups and cooking wine.",
+    "It works as a deterrent, making drinking alcohol acutely unpleasant rather than reducing cravings directly." ]},
+  { name:"Acamprosate", cls:"NMDA/GABA modulator", clues:[
+    "This medication is prescribed to a patient with alcohol use disorder to help maintain abstinence.",
+    "It belongs to a class that modulates NMDA and GABA neurotransmission.",
+    "It works by restoring balance to glutamate and GABA signaling disrupted by chronic alcohol use.",
+    "Diarrhea is the most commonly reported side effect.",
+    "Unlike disulfiram, it does not cause a reaction if alcohol is consumed, instead reducing craving and withdrawal-related discomfort.",
+    "It requires dose adjustment in kidney impairment and is typically started after a patient has already stopped drinking." ]},
+  { name:"Varenicline", cls:"Nicotinic receptor partial agonist", clues:[
+    "This medication is prescribed to a patient trying to quit smoking.",
+    "It belongs to the nicotinic acetylcholine receptor partial agonist class.",
+    "It works by partially stimulating nicotinic receptors, reducing craving while blocking nicotine's full rewarding effect.",
+    "Nausea and vivid dreams are commonly reported.",
+    "It is typically started about a week before a chosen quit date, allowing levels to build up.",
+    "Its partial agonist activity both eases withdrawal and blunts the reward of a relapse cigarette." ]},
+  { name:"Dapsone", cls:"Sulfone antibiotic", clues:[
+    "This medication is used for a patient with leprosy, certain skin conditions, or to prevent Pneumocystis pneumonia.",
+    "It belongs to the sulfone antibiotic class.",
+    "It works by inhibiting bacterial folate synthesis, similar in concept to sulfonamide antibiotics.",
+    "Hemolytic anemia, especially in patients with G6PD deficiency, is a notable risk.",
+    "Screening for G6PD deficiency is often recommended before starting, due to the risk of severe hemolysis.",
+    "It is used both as an antibiotic for leprosy and as prophylaxis against a specific opportunistic pneumonia in immunocompromised patients." ]},
+  { name:"Chloroquine", cls:"Antimalarial", clues:[
+    "This medication is used for a patient with malaria caused by a susceptible parasite species.",
+    "It belongs to the antimalarial class.",
+    "It works by interfering with the malaria parasite's ability to detoxify heme within red blood cells.",
+    "Retinal toxicity with long-term use and, in overdose, cardiotoxicity are notable risks.",
+    "Resistance is now widespread in many malaria-endemic regions, limiting its usefulness for prophylaxis in those areas.",
+    "It is chemically closely related to a more commonly used antirheumatic and antimalarial drug on this list." ]},
+  { name:"Mefloquine", cls:"Antimalarial", clues:[
+    "This medication is used for a traveler needing malaria prophylaxis in certain regions.",
+    "It belongs to the antimalarial class.",
+    "It works by disrupting the malaria parasite's ability to detoxify heme within red blood cells.",
+    "Vivid dreams and, rarely, significant neuropsychiatric effects are notable risks.",
+    "It carries a boxed warning for psychiatric and neurologic side effects, limiting its use in patients with certain histories.",
+    "It is taken weekly for malaria prevention, unlike some alternatives requiring daily dosing." ]},
+  { name:"Atovaquone-proguanil", cls:"Antimalarial combination", clues:[
+    "This medication is used for a traveler needing malaria prophylaxis or treatment.",
+    "It belongs to the antimalarial class, combining two agents with complementary mechanisms.",
+    "It works by disrupting parasite mitochondrial function and interfering with folate metabolism.",
+    "Gastrointestinal upset and headache are commonly reported.",
+    "It requires a shorter prophylaxis course after leaving a malaria-endemic area than some other options.",
+    "It is a popular traveler's choice due to its relatively short post-travel dosing requirement and good tolerability." ]},
+  { name:"Ivermectin", cls:"Antiparasitic", clues:[
+    "This medication is used for a patient with certain parasitic worm infections or scabies.",
+    "It belongs to the antiparasitic class.",
+    "It works by binding glutamate-gated chloride channels in parasites, causing paralysis and death.",
+    "Dizziness and gastrointestinal upset are commonly reported.",
+    "It gained widespread public attention as an unproven COVID-19 treatment, despite its established antiparasitic role.",
+    "It is used both orally for certain worm infections and topically for head lice." ]},
+  { name:"Albendazole", cls:"Antiparasitic (benzimidazole)", clues:[
+    "This medication is used for a patient with certain intestinal worm infections.",
+    "It belongs to the benzimidazole antiparasitic class.",
+    "It works by inhibiting microtubule formation in parasites, disrupting their glucose uptake and survival.",
+    "Gastrointestinal upset and, rarely, liver enzyme elevation are notable.",
+    "It has broad activity against numerous intestinal parasites, including hookworm and certain tapeworm infections.",
+    "It is generally preferred as a single-dose oral treatment for common intestinal worm infections." ]},
+  { name:"Mebendazole", cls:"Antiparasitic (benzimidazole)", clues:[
+    "This medication is used for a patient with pinworm or other intestinal worm infections.",
+    "It belongs to the benzimidazole antiparasitic class.",
+    "It works by inhibiting microtubule formation in parasites, disrupting their metabolism.",
+    "Gastrointestinal upset is commonly reported.",
+    "Treating pinworm infection often requires treating the whole household simultaneously to prevent reinfection.",
+    "It is a classic first-line treatment for pinworm infection in children." ]},
+  { name:"Praziquantel", cls:"Antiparasitic", clues:[
+    "This medication is used for a patient with a tapeworm or fluke infection.",
+    "It belongs to the antiparasitic class.",
+    "It works by increasing calcium permeability in parasite cell membranes, causing paralysis and death.",
+    "Dizziness and abdominal pain are commonly reported.",
+    "It is effective against a very broad range of flatworm parasites, including schistosomiasis.",
+    "It remains the primary treatment for schistosomiasis worldwide, a major global parasitic disease." ]},
+  { name:"Voriconazole", cls:"Triazole antifungal", clues:[
+    "This medication is used for a patient with a serious invasive fungal infection, such as invasive aspergillosis.",
+    "It belongs to the triazole antifungal class.",
+    "It works by inhibiting fungal ergosterol synthesis.",
+    "Visual disturbances and, with long-term use, skin cancer risk are notable.",
+    "It is a significant CYP450 inhibitor, causing numerous important drug interactions.",
+    "It is generally considered first-line therapy for invasive aspergillosis, a serious fungal lung infection." ]},
+  { name:"Posaconazole", cls:"Triazole antifungal", clues:[
+    "This medication is used for a severely immunocompromised patient to prevent invasive fungal infection.",
+    "It belongs to the triazole antifungal class.",
+    "It works by inhibiting fungal ergosterol synthesis.",
+    "Liver enzyme elevation and QT prolongation are notable.",
+    "It has activity against certain molds that some other azole antifungals do not reliably cover.",
+    "It is often used prophylactically in patients with prolonged, severe neutropenia." ]},
+  { name:"Itraconazole", cls:"Triazole antifungal", clues:[
+    "This medication is used for a patient with a fungal nail infection or certain systemic fungal infections.",
+    "It belongs to the triazole antifungal class.",
+    "It works by inhibiting fungal ergosterol synthesis.",
+    "Liver enzyme elevation and, per a boxed warning, heart failure risk are notable.",
+    "It carries a boxed warning against use in patients with a history of heart failure due to negative effects on cardiac contractility.",
+    "Its absorption depends heavily on stomach acidity, so it interacts significantly with acid-reducing medications." ]},
+  { name:"Amphotericin B", cls:"Polyene antifungal", clues:[
+    "This medication is used for a critically ill patient with a severe, life-threatening systemic fungal infection.",
+    "It belongs to the polyene antifungal class.",
+    "It works by binding fungal cell membrane ergosterol, causing cell contents to leak out.",
+    "Significant kidney toxicity and infusion-related fever and chills are notable, earning it a harsh nickname.",
+    "It is sometimes called 'amphoterrible' among clinicians due to its notoriously difficult side effect profile.",
+    "Lipid-based formulations were developed specifically to reduce its severe kidney toxicity." ]},
+  { name:"Ganciclovir", cls:"Antiviral (anti-CMV)", clues:[
+    "This medication is used for a patient with cytomegalovirus (CMV) infection, often after transplant.",
+    "It belongs to the antiviral class, specifically targeting CMV.",
+    "It works by inhibiting viral DNA polymerase after activation, halting CMV replication.",
+    "Bone marrow suppression is a prominent risk.",
+    "It requires dose adjustment for kidney function and regular blood count monitoring during treatment.",
+    "It is a key treatment for CMV infection, a common and serious concern after organ or stem cell transplant." ]},
+  { name:"Foscarnet", cls:"Antiviral (anti-CMV, non-nucleoside)", clues:[
+    "This medication is used for a patient with CMV or resistant herpes infection, often when other antivirals fail.",
+    "It belongs to a non-nucleoside antiviral class targeting viral DNA polymerase directly.",
+    "It works by directly inhibiting viral DNA polymerase without requiring activation by a viral enzyme.",
+    "Significant kidney toxicity and electrolyte disturbances are notable.",
+    "It is useful against certain viruses resistant to standard antivirals that require viral enzyme activation.",
+    "It requires aggressive IV hydration and close electrolyte monitoring due to its kidney toxicity." ]},
+  { name:"Ritonavir", cls:"Protease inhibitor (antiretroviral / boosting agent)", clues:[
+    "This medication is used for a patient with HIV, often at a low dose to boost another antiviral's levels.",
+    "It belongs to the protease inhibitor antiretroviral class.",
+    "It works by inhibiting HIV protease, and at low doses, by inhibiting CYP3A4 to boost other drug levels.",
+    "Gastrointestinal upset and numerous drug interactions are notable.",
+    "It is now used far more often as a 'booster' for other drugs than as an antiretroviral in its own right.",
+    "It is the 'ritonavir' component paired with nirmatrelvir in the COVID-19 treatment Paxlovid." ]},
+  { name:"Dolutegravir", cls:"Integrase inhibitor (antiretroviral)", clues:[
+    "This medication is used for a patient with HIV as part of combination antiretroviral therapy.",
+    "It belongs to the integrase strand transfer inhibitor antiretroviral class.",
+    "It works by inhibiting HIV integrase, preventing viral DNA from integrating into the host genome.",
+    "Insomnia and weight gain are commonly reported.",
+    "It has a high barrier to developing resistance, making it a preferred backbone of modern HIV regimens.",
+    "It is often combined with just one or two other agents in modern simplified, two- or three-drug HIV regimens." ]},
+  { name:"Bictegravir", cls:"Integrase inhibitor (antiretroviral)", clues:[
+    "This medication is used for a patient with HIV as part of a combination antiretroviral tablet.",
+    "It belongs to the integrase strand transfer inhibitor antiretroviral class.",
+    "It works by inhibiting HIV integrase, blocking viral DNA integration.",
+    "Diarrhea and headache are commonly reported.",
+    "It is only available as part of a fixed-dose single-tablet combination regimen, not as a standalone pill.",
+    "It is combined with tenofovir alafenamide and emtricitabine in a widely used once-daily HIV regimen." ]},
+  { name:"Remdesivir", cls:"RNA polymerase inhibitor (antiviral)", clues:[
+    "This medication is used for a hospitalized patient with severe COVID-19.",
+    "It belongs to the RNA-dependent RNA polymerase inhibitor antiviral class.",
+    "It works by being incorporated into viral RNA, causing premature termination of viral replication.",
+    "Liver enzyme elevation and infusion-related reactions are notable.",
+    "It was one of the first antivirals granted emergency authorization specifically for COVID-19.",
+    "It is given as an intravenous infusion, typically over several days in hospitalized patients." ]},
+  { name:"Nirmatrelvir-ritonavir", cls:"Protease inhibitor combination (antiviral)", clues:[
+    "This medication is used for a patient with mild to moderate COVID-19 at high risk for severe disease.",
+    "It belongs to the protease inhibitor antiviral class, combined with a pharmacokinetic booster.",
+    "It works by inhibiting a key viral protease, with ritonavir added to boost its blood levels.",
+    "Altered taste and numerous drug interactions from the ritonavir component are notable.",
+    "It must be started within a short window of symptom onset to be effective.",
+    "It is sold under the brand name Paxlovid and requires a five-day oral course." ]},
+  { name:"Bupivacaine", cls:"Amide local anesthetic", clues:[
+    "This medication is used for a patient needing regional anesthesia, such as an epidural or nerve block.",
+    "It belongs to the amide local anesthetic class.",
+    "It works by blocking sodium channels in nerve fibers, preventing pain signal transmission.",
+    "Cardiotoxicity is a notable risk if it is accidentally injected into a blood vessel.",
+    "It has a long duration of action, making it popular for epidurals during labor and postoperative pain blocks.",
+    "It is also available in a liposomal, extended-release formulation for longer-lasting postoperative pain control." ]},
+  { name:"Ropivacaine", cls:"Amide local anesthetic", clues:[
+    "This medication is used for a patient needing regional anesthesia, such as an epidural or peripheral nerve block.",
+    "It belongs to the amide local anesthetic class.",
+    "It works by blocking sodium channels in nerve fibers, preventing pain signal transmission.",
+    "Cardiotoxicity is a risk, though considered somewhat less than with an older, closely related local anesthetic.",
+    "It has a slightly better cardiac safety profile than a related local anesthetic it was designed to replace.",
+    "It is commonly used for labor epidurals and peripheral nerve blocks." ]},
+  { name:"Propofol", cls:"General anesthetic (sedative-hypnotic)", clues:[
+    "This medication is used for a patient undergoing general anesthesia or requiring sedation on a ventilator.",
+    "It belongs to the general anesthetic, sedative-hypnotic class.",
+    "It works by enhancing GABA-A receptor activity, producing rapid sedation.",
+    "Hypotension and, with prolonged high-dose infusion, a rare but serious metabolic syndrome are notable.",
+    "It is formulated in a lipid emulsion, giving it a distinctive milky white appearance.",
+    "Its rapid onset and short duration make it a favorite for procedural sedation and induction of anesthesia." ]},
+  { name:"Etomidate", cls:"General anesthetic induction agent", clues:[
+    "This medication is used for rapid induction of anesthesia, particularly in hemodynamically unstable patients.",
+    "It belongs to the general anesthetic induction agent class.",
+    "It works by enhancing GABA-A receptor activity, producing rapid loss of consciousness.",
+    "Adrenal suppression, even after a single dose, is a distinctive concern.",
+    "It causes minimal effect on blood pressure compared to other induction agents, making it useful in unstable patients.",
+    "Its relative hemodynamic stability makes it a preferred choice for emergency airway management in critically ill patients." ]},
+  { name:"Ketamine", cls:"NMDA receptor antagonist (dissociative anesthetic)", clues:[
+    "This medication is used for procedural sedation, induction of anesthesia, or treatment-resistant depression.",
+    "It belongs to the NMDA receptor antagonist, dissociative anesthetic class.",
+    "It works by blocking NMDA glutamate receptors, producing a dissociative anesthetic state.",
+    "Hallucinations and elevated blood pressure are notable, along with a distinctive dissociative sensation.",
+    "At a much lower dose than used for anesthesia, an intranasal form is approved for treatment-resistant depression.",
+    "It preserves airway reflexes better than many other anesthetics, making it useful in certain emergency settings." ]},
+  { name:"Midazolam", cls:"Benzodiazepine (procedural sedation)", clues:[
+    "This medication is used for procedural sedation, pre-anesthesia anxiety relief, or acute seizures.",
+    "It belongs to the benzodiazepine class.",
+    "It works by enhancing GABA-A receptor activity.",
+    "Respiratory depression, especially combined with opioids, and amnesia are notable.",
+    "It has a fast onset and short duration, making it a preferred benzodiazepine for procedural sedation.",
+    "It is also available as a nasal spray for rapid treatment of prolonged seizures outside the hospital." ]},
+  { name:"Succinylcholine", cls:"Depolarizing neuromuscular blocker", clues:[
+    "This medication is used for a patient needing rapid muscle paralysis for emergency airway management.",
+    "It belongs to the depolarizing neuromuscular blocker class.",
+    "It works by persistently activating acetylcholine receptors at the neuromuscular junction, causing sustained depolarization and paralysis.",
+    "Hyperkalemia and, in susceptible patients, malignant hyperthermia are notable risks.",
+    "It has the fastest onset and shortest duration of any paralytic, making it ideal for rapid sequence intubation.",
+    "It is contraindicated in patients at risk for severe hyperkalemia, such as those with major burns or prolonged immobility." ]},
+  { name:"Rocuronium", cls:"Nondepolarizing neuromuscular blocker", clues:[
+    "This medication is used for a patient needing muscle paralysis for intubation or surgery.",
+    "It belongs to the nondepolarizing neuromuscular blocker class.",
+    "It works by competitively blocking acetylcholine receptors at the neuromuscular junction.",
+    "Prolonged paralysis if reversal is inadequate is a notable risk.",
+    "It has a relatively fast onset among nondepolarizing agents, making it a common alternative when succinylcholine is contraindicated.",
+    "It has a specific reversal agent that directly encapsulates the drug molecule, allowing rapid reversal of paralysis." ]},
+  { name:"Vecuronium", cls:"Nondepolarizing neuromuscular blocker", clues:[
+    "This medication is used for a patient needing sustained muscle paralysis during surgery.",
+    "It belongs to the nondepolarizing neuromuscular blocker class.",
+    "It works by competitively blocking acetylcholine receptors at the neuromuscular junction.",
+    "Prolonged paralysis, especially with liver or kidney impairment, is a notable risk.",
+    "It requires reconstitution from a powder before use, unlike some ready-to-use paralytics.",
+    "It has an intermediate duration of action, useful for procedures of moderate length." ]},
+  { name:"Sugammadex", cls:"Neuromuscular blocker reversal agent", clues:[
+    "This medication is used for a patient who needs rapid reversal of certain neuromuscular blocking drugs after surgery.",
+    "It belongs to a unique neuromuscular blocker reversal agent class.",
+    "It works by directly encapsulating rocuronium or vecuronium molecules, inactivating them.",
+    "Hypersensitivity reactions are a notable risk.",
+    "It provides much faster and more complete reversal than older reversal agents like neostigmine.",
+    "Its unique 'molecular cage' mechanism only works on specific neuromuscular blockers, not all paralytics." ]},
+  { name:"Neostigmine", cls:"Acetylcholinesterase inhibitor", clues:[
+    "This medication is used for a patient needing reversal of neuromuscular blockade, or one with myasthenia gravis.",
+    "It belongs to the acetylcholinesterase inhibitor class.",
+    "It works by inhibiting acetylcholinesterase, increasing acetylcholine availability at the neuromuscular junction.",
+    "Excess secretions, bradycardia, and gastrointestinal cramping are notable, requiring co-administration with an anticholinergic.",
+    "It is typically given together with glycopyrrolate to counteract its unwanted cholinergic side effects.",
+    "It is also used off-label to stimulate bowel motility in certain cases of severe colonic distension." ]},
+  { name:"Misoprostol", cls:"Prostaglandin E1 analog", clues:[
+    "This medication is used for a patient needing cervical ripening, medication abortion, or prevention of NSAID-induced ulcers.",
+    "It belongs to the prostaglandin E1 analog class.",
+    "It works by stimulating uterine contractions and, separately, protecting the gastric lining.",
+    "Cramping, diarrhea, and fever are commonly reported.",
+    "It is often combined with mifepristone for medication abortion, or used alone for cervical ripening before labor induction.",
+    "It has very different clinical uses depending on the setting, from obstetrics to gastric ulcer prevention." ]},
+  { name:"Mifepristone", cls:"Progesterone receptor antagonist", clues:[
+    "This medication is used for a patient undergoing early medication abortion or, in a different dose, for Cushing syndrome.",
+    "It belongs to the progesterone receptor antagonist class.",
+    "It works by blocking progesterone receptors, disrupting the uterine lining needed to sustain a pregnancy.",
+    "Bleeding and cramping are expected effects when used for its intended purpose.",
+    "It is typically followed by misoprostol given one to two days later to complete the process.",
+    "Its use has been the subject of significant legal and political debate in the United States." ]},
+  { name:"Oxytocin", cls:"Uterotonic hormone", clues:[
+    "This medication is used for a patient in labor needing induction or augmentation, or for postpartum hemorrhage prevention.",
+    "It belongs to the uterotonic hormone class.",
+    "It works by binding oxytocin receptors in the uterus, stimulating contractions.",
+    "Uterine hyperstimulation and, with excessive use, water intoxication are notable risks.",
+    "It is given as a carefully titrated IV infusion during labor induction, with close monitoring of contraction pattern.",
+    "It is a synthetic version of a hormone the body itself releases during labor and breastfeeding." ]},
+  { name:"Terbutaline", cls:"Beta-2 agonist (tocolytic)", clues:[
+    "This medication is used off-label for a pregnant patient with preterm labor, or for an asthma exacerbation.",
+    "It belongs to the beta-2 agonist class.",
+    "It works by stimulating beta-2 adrenergic receptors, relaxing uterine and airway smooth muscle.",
+    "Tachycardia and tremor are commonly reported.",
+    "It is used briefly to slow preterm contractions, though long-term maintenance tocolysis is now discouraged due to safety concerns.",
+    "It shares its mechanism with asthma rescue inhalers, but here targets the uterus instead of the lungs." ]},
+  { name:"Magnesium sulfate", cls:"Anticonvulsant / tocolytic", clues:[
+    "This medication is used for a pregnant patient with preeclampsia or eclampsia, or preterm labor for fetal neuroprotection.",
+    "It belongs to a unique class acting as both an anticonvulsant and smooth muscle relaxant.",
+    "It works by blocking calcium influx, stabilizing neuromuscular and cardiac membranes.",
+    "Respiratory depression and loss of deep tendon reflexes at toxic levels are notable, requiring close monitoring.",
+    "Calcium gluconate is kept at the bedside as the specific antidote in case of toxicity.",
+    "It is the standard treatment to prevent seizures in severe preeclampsia and eclampsia." ]},
+  { name:"Progesterone", cls:"Progestin hormone", clues:[
+    "This medication is used for a pregnant patient at risk for preterm birth, or for hormone replacement.",
+    "It belongs to the progestin hormone class.",
+    "It works by activating progesterone receptors, supporting the uterine lining and reducing uterine contractility.",
+    "Injection site reactions with the intramuscular form, and drowsiness with the oral form, are notable.",
+    "It is given weekly by injection or daily vaginally to certain women at high risk of preterm birth.",
+    "It is available in oral, vaginal, and injectable forms, each suited to different clinical situations." ]},
+  { name:"Levonorgestrel", cls:"Progestin (emergency contraception / IUD)", clues:[
+    "This medication is used for emergency contraception, or as a long-acting intrauterine contraceptive.",
+    "It belongs to the progestin hormone class.",
+    "It works by preventing or delaying ovulation and thickening cervical mucus.",
+    "Nausea and irregular bleeding are commonly reported.",
+    "Taken as a single dose, it is most effective for emergency contraception the sooner it is taken after unprotected intercourse.",
+    "It is available over the counter as an emergency contraceptive pill and, in a different formulation, as a long-acting IUD." ]},
+  { name:"Etonogestrel implant", cls:"Progestin (contraceptive implant)", clues:[
+    "This medication is used for a woman seeking long-acting, reversible contraception.",
+    "It belongs to the progestin hormone contraceptive class.",
+    "It works by suppressing ovulation and thickening cervical mucus.",
+    "Irregular bleeding is the most commonly reported side effect.",
+    "It is a small rod inserted under the skin of the upper arm, providing contraception for up to three years.",
+    "It is one of the most effective reversible contraceptive methods available, with a failure rate under one percent." ]},
+  { name:"Tretinoin", cls:"Topical retinoid", clues:[
+    "This medication is used for a patient with acne or photoaging skin changes.",
+    "It belongs to the topical retinoid class.",
+    "It works by normalizing skin cell turnover and stimulating collagen production.",
+    "Skin dryness, peeling, and sun sensitivity are commonly reported.",
+    "It is generally applied at night, since it can be broken down by sunlight and increases photosensitivity.",
+    "It is also used, in a different oral formulation, as a targeted treatment for a specific type of leukemia." ]},
+  { name:"Minoxidil", cls:"Vasodilator (topical/oral)", clues:[
+    "This medication is used for a patient with androgenetic hair loss, or, orally, for severe resistant hypertension.",
+    "It belongs to the direct vasodilator class.",
+    "It works topically by prolonging the hair growth cycle, and orally by relaxing arteriolar smooth muscle.",
+    "Unwanted hair growth elsewhere on the body and, orally, fluid retention are notable.",
+    "It was originally developed as an oral blood pressure medication before its hair growth effect was discovered.",
+    "It is available over the counter as a topical solution for hair loss and by prescription as an oral tablet for hypertension." ]},
+  { name:"Tazarotene", cls:"Topical retinoid", clues:[
+    "This medication is used for a patient with acne or psoriasis.",
+    "It belongs to the topical retinoid class.",
+    "It works by normalizing skin cell turnover and reducing inflammation.",
+    "Skin irritation, dryness, and sun sensitivity are commonly reported.",
+    "It is considered one of the more potent topical retinoids, sometimes causing more initial irritation than others.",
+    "It is used for two different skin conditions, acne and psoriasis, through similar cell-turnover effects." ]},
+  { name:"Hydroquinone", cls:"Topical skin-lightening agent", clues:[
+    "This medication is used for a patient with hyperpigmentation, such as melasma or dark spots.",
+    "It belongs to the topical skin-lightening agent class.",
+    "It works by inhibiting tyrosinase, an enzyme needed for melanin production.",
+    "Skin irritation and, with prolonged use, a paradoxical darkening called ochronosis are notable.",
+    "Prolonged continuous use is generally discouraged due to the risk of this paradoxical skin darkening.",
+    "It is often used in cycles, with breaks built in, to reduce the risk of long-term skin changes." ]},
+  { name:"Selenium sulfide", cls:"Antifungal / antiseborrheic (topical)", clues:[
+    "This medication is used for a patient with dandruff or a fungal skin condition called tinea versicolor.",
+    "It belongs to the antifungal and antiseborrheic topical class.",
+    "It works by reducing skin cell turnover and having antifungal activity against the yeast that causes these conditions.",
+    "Skin or scalp irritation is commonly reported.",
+    "It is available over the counter as a medicated shampoo for both dandruff and certain fungal skin conditions.",
+    "The same yeast that causes ordinary dandruff is implicated in the skin condition it also treats." ]},
+  { name:"Ketoconazole", cls:"Azole antifungal", clues:[
+    "This medication is used for a patient with a fungal skin infection or dandruff, or, orally, for certain systemic infections.",
+    "It belongs to the azole antifungal class.",
+    "It works by inhibiting fungal ergosterol synthesis.",
+    "With oral use, significant liver toxicity and hormonal side effects are notable.",
+    "Oral use is now limited due to liver toxicity risk, with topical shampoo and cream forms much more commonly used.",
+    "It is available as an antidandruff shampoo, a topical cream, and, less commonly now, an oral tablet." ]},
+  { name:"Griseofulvin", cls:"Antifungal", clues:[
+    "This medication is prescribed to a patient, often a child, with a fungal scalp or skin infection.",
+    "It belongs to a unique antifungal class distinct from azoles or allylamines.",
+    "It works by disrupting fungal microtubule function, inhibiting fungal cell division.",
+    "Headache and gastrointestinal upset are commonly reported.",
+    "It should be taken with a fatty meal to enhance its absorption.",
+    "It is a classic treatment for fungal scalp infections in children, a condition called tinea capitis." ]},
+  { name:"Cyclopentolate", cls:"Anticholinergic (ophthalmic)", clues:[
+    "This medication is used for a patient needing pupil dilation for an eye examination.",
+    "It belongs to the anticholinergic class, used as an eye drop.",
+    "It works by blocking muscarinic receptors in the eye, relaxing the muscles controlling pupil size and focus.",
+    "Blurred vision and light sensitivity are expected effects.",
+    "It is commonly used in children for a thorough eye exam, since it also temporarily paralyzes focusing ability.",
+    "Its effects can last up to a day, longer than some other dilating eye drops." ]},
+  { name:"Tropicamide", cls:"Anticholinergic (ophthalmic)", clues:[
+    "This medication is used for a patient needing pupil dilation for a routine eye examination.",
+    "It belongs to the anticholinergic class, used as an eye drop.",
+    "It works by blocking muscarinic receptors in the eye, causing pupil dilation.",
+    "Blurred vision and light sensitivity are expected effects.",
+    "It has a shorter duration of action than some other dilating drops, making it convenient for routine exams.",
+    "It is one of the most commonly used eye drops for a standard dilated eye exam." ]},
+  { name:"Olopatadine", cls:"Antihistamine (ophthalmic)", clues:[
+    "This medication is used for a patient with itchy, red eyes from seasonal allergies.",
+    "It belongs to the antihistamine class, used as an eye drop.",
+    "It works by blocking H1 histamine receptors and stabilizing mast cells in the eye.",
+    "Mild eye irritation is the most common side effect.",
+    "It is available both over the counter and by prescription, at different concentrations.",
+    "It is a common first-line eye drop specifically for allergic conjunctivitis." ]},
+  { name:"Bimatoprost", cls:"Prostaglandin analog", clues:[
+    "This medication is prescribed to a patient with open-angle glaucoma, or used cosmetically for eyelash growth.",
+    "It belongs to the prostaglandin analog class.",
+    "It works by increasing uveoscleral outflow of aqueous humor, lowering intraocular pressure.",
+    "Eyelash growth and permanent darkening of the iris are distinctive side effects.",
+    "Its eyelash-growing side effect led to a separate, lower-concentration product marketed specifically for that cosmetic use.",
+    "It is sold as Lumigan for glaucoma and as Latisse for eyelash growth, at different concentrations." ]},
+  { name:"Activated charcoal", cls:"Adsorbent (toxicology)", clues:[
+    "This medication is used for a patient who has recently ingested certain poisons or a medication overdose.",
+    "It belongs to the adsorbent class used in toxicology.",
+    "It works by adsorbing certain toxins onto its surface within the gut, preventing their absorption.",
+    "Vomiting and, if aspirated, lung injury are notable risks.",
+    "It is most effective when given within a short window after ingestion and does not work for all types of poisoning.",
+    "It does not bind certain substances well, including alcohols, metals, and strong acids or bases." ]},
+  { name:"Deferoxamine", cls:"Iron chelator", clues:[
+    "This medication is used for a patient with acute iron overdose or chronic iron overload from repeated transfusions.",
+    "It belongs to the iron chelator class.",
+    "It works by binding free iron, forming a complex that is then excreted, typically through the urine.",
+    "Hypotension with rapid infusion and, rarely, hearing or vision changes with long-term use are notable.",
+    "It can turn the urine a distinctive reddish color as the iron complex is excreted.",
+    "It is the classic antidote for acute iron poisoning, a common cause of pediatric overdose." ]},
+  { name:"Physostigmine", cls:"Acetylcholinesterase inhibitor (antidote)", clues:[
+    "This medication is used for a patient with anticholinergic toxidrome from an overdose.",
+    "It belongs to the acetylcholinesterase inhibitor class, used here as an antidote.",
+    "It works by inhibiting acetylcholinesterase and crossing into the brain, reversing central anticholinergic toxicity.",
+    "Seizures and bradycardia are notable risks, limiting its use to specific, confirmed cases.",
+    "Unlike some other cholinesterase inhibitors, it crosses the blood-brain barrier, allowing it to reverse central symptoms.",
+    "It is reserved for severe anticholinergic toxicity given its own risk of causing seizures if misapplied." ]},
+  { name:"Flumazenil", cls:"Benzodiazepine receptor antagonist (antidote)", clues:[
+    "This medication is used for a patient with benzodiazepine overdose or oversedation.",
+    "It belongs to the benzodiazepine receptor antagonist class.",
+    "It works by competitively blocking the benzodiazepine binding site on the GABA-A receptor.",
+    "It can precipitate seizures, especially in patients who are benzodiazepine-dependent.",
+    "It is used cautiously, since reversing sedation can unmask a dangerous withdrawal seizure in long-term benzodiazepine users.",
+    "Its use is generally avoided in patients on chronic benzodiazepine therapy due to seizure risk." ]},
+  { name:"Pralidoxime", cls:"Cholinesterase reactivator (antidote)", clues:[
+    "This medication is used for a patient with organophosphate pesticide or nerve agent poisoning.",
+    "It belongs to the cholinesterase reactivator class.",
+    "It works by reactivating acetylcholinesterase that has been inhibited by organophosphate compounds.",
+    "It must be given promptly, since the enzyme-toxin bond can become permanent, or 'aged,' over time.",
+    "It is given alongside atropine, which treats symptoms while this drug addresses the underlying enzyme block.",
+    "It is a key component of nerve agent and pesticide poisoning treatment kits." ]},
+  { name:"Fomepizole", cls:"Alcohol dehydrogenase inhibitor (antidote)", clues:[
+    "This medication is used for a patient with methanol or ethylene glycol poisoning.",
+    "It belongs to the alcohol dehydrogenase inhibitor class.",
+    "It works by blocking alcohol dehydrogenase, preventing methanol or ethylene glycol from being converted into their toxic metabolites.",
+    "Headache and nausea are commonly reported.",
+    "It has largely replaced intravenous ethanol as the preferred antidote for these specific toxic alcohol poisonings.",
+    "It works by essentially blocking the same enzyme that ethanol would otherwise saturate to achieve a similar protective effect." ]},
+  { name:"Digoxin immune Fab", cls:"Digoxin antidote (antibody fragment)", clues:[
+    "This medication is used for a patient with severe, life-threatening digoxin toxicity.",
+    "It belongs to a unique antibody fragment antidote class.",
+    "It works by binding free digoxin molecules, inactivating them and allowing their elimination.",
+    "Hypokalemia can occur as digoxin's blocking effect on cellular potassium is suddenly reversed.",
+    "It is specifically designed to bind and neutralize digoxin, a very narrow-spectrum antidote.",
+    "It is the definitive treatment for severe digoxin toxicity, reversing life-threatening arrhythmias." ]},
+  { name:"Pramlintide", cls:"Amylin analog", clues:[
+    "This medication is used for a patient with type 1 or type 2 diabetes not fully controlled by insulin alone.",
+    "It belongs to the amylin analog class.",
+    "It works by mimicking amylin, slowing gastric emptying and suppressing glucagon secretion after meals.",
+    "Nausea and hypoglycemia, especially when combined with insulin, are notable risks.",
+    "It is injected alongside mealtime insulin but must be given as a separate injection, never mixed in the same syringe.",
+    "It targets after-meal blood sugar spikes through a hormone pathway distinct from insulin itself." ]},
+  { name:"Ferric carboxymaltose", cls:"Intravenous iron", clues:[
+    "This medication is used for a patient with iron deficiency anemia who cannot tolerate or absorb oral iron.",
+    "It belongs to the intravenous iron replacement class.",
+    "It works by directly replenishing iron stores, bypassing the gut entirely.",
+    "Hypophosphatemia and, rarely, infusion reactions are notable.",
+    "It allows a large iron dose to be given in just one or two infusions, unlike older IV iron formulations requiring many visits.",
+    "Its ability to deliver a large dose quickly has made it increasingly popular for correcting significant iron deficiency." ]},
+  { name:"Iron sucrose", cls:"Intravenous iron", clues:[
+    "This medication is used for a patient with iron deficiency anemia, particularly related to chronic kidney disease.",
+    "It belongs to the intravenous iron replacement class.",
+    "It works by directly replenishing iron stores, bypassing gastrointestinal absorption.",
+    "Hypotension and, rarely, infusion reactions are notable.",
+    "It is commonly used in dialysis patients, who often cannot absorb enough iron orally to keep pace with losses.",
+    "It requires multiple smaller infusions rather than one large dose, unlike some newer IV iron formulations." ]},
+  { name:"Cinacalcet", cls:"Calcimimetic", clues:[
+    "This medication is used for a patient with secondary hyperparathyroidism from chronic kidney disease, or parathyroid cancer.",
+    "It belongs to the calcimimetic class.",
+    "It works by increasing the calcium-sensing receptor's sensitivity, reducing parathyroid hormone secretion.",
+    "Hypocalcemia and gastrointestinal upset are notable.",
+    "It tricks the parathyroid gland into 'sensing' more calcium than is actually present, reducing hormone output.",
+    "It reduces parathyroid hormone levels without directly altering blood calcium intake or vitamin D." ]},
+  { name:"Sevelamer", cls:"Phosphate binder", clues:[
+    "This medication is used for a patient with chronic kidney disease and elevated phosphate levels.",
+    "It belongs to the phosphate binder class.",
+    "It works by binding dietary phosphate in the gut, preventing its absorption.",
+    "Gastrointestinal upset is commonly reported.",
+    "Unlike calcium-based phosphate binders, it does not add extra calcium load, useful in patients prone to vascular calcification.",
+    "It must be taken with meals to bind phosphate from food as it is being digested." ]},
+  { name:"Patiromer", cls:"Potassium binder", clues:[
+    "This medication is used for a patient with chronic hyperkalemia, often related to kidney disease or certain heart medications.",
+    "It belongs to the potassium binder class.",
+    "It works by binding potassium in the gut in exchange for calcium, increasing fecal potassium excretion.",
+    "Constipation and low magnesium are notable.",
+    "It allows patients to continue taking potassium-raising heart medications that would otherwise need to be reduced or stopped.",
+    "It must be separated in timing from other oral medications, since it can bind them as well." ]},
+  { name:"Sodium zirconium cyclosilicate", cls:"Potassium binder", clues:[
+    "This medication is used for a patient with chronic hyperkalemia.",
+    "It belongs to the potassium binder class.",
+    "It works by selectively trapping potassium ions in the gastrointestinal tract, increasing their excretion in stool.",
+    "Edema and hypokalemia with overcorrection are notable.",
+    "It has a faster onset of action than an older potassium binder, making it useful for more urgent correction.",
+    "It is taken as a powder mixed with water, generally once daily for chronic maintenance." ]},
+  { name:"Apremilast", cls:"Phosphodiesterase-4 inhibitor", clues:[
+    "This medication is prescribed to a patient with psoriasis or psoriatic arthritis.",
+    "It belongs to the phosphodiesterase-4 inhibitor class.",
+    "It works by inhibiting PDE4, reducing production of inflammatory cytokines.",
+    "Diarrhea, nausea, and weight loss are commonly reported.",
+    "Unlike biologics for psoriasis, it is taken as an oral tablet and does not require injections.",
+    "It is often chosen for patients who prefer to avoid injectable biologic therapy." ]},
+  { name:"Belimumab", cls:"Anti-BLyS biologic", clues:[
+    "This medication is prescribed to a patient with systemic lupus erythematosus not controlled by standard therapy.",
+    "It belongs to the anti-B-lymphocyte stimulator (BLyS) biologic class.",
+    "It works by inhibiting BLyS, a protein that promotes survival of antibody-producing B-cells.",
+    "Infusion reactions and increased infection risk are notable.",
+    "It was the first biologic specifically approved for systemic lupus erythematosus in decades.",
+    "It is available as both an IV infusion and a subcutaneous injection." ]},
+  { name:"Nitazoxanide", cls:"Antiparasitic / antiviral", clues:[
+    "This medication is used for a patient with certain parasitic gastrointestinal infections, such as Giardia or Cryptosporidium.",
+    "It belongs to a broad-spectrum antiparasitic class with some antiviral activity.",
+    "It works by interfering with an enzyme-dependent electron transfer reaction essential to anaerobic organisms.",
+    "Abdominal pain and headache are commonly reported.",
+    "It is one of the few approved treatments for Cryptosporidium infection, which is otherwise difficult to treat.",
+    "It has broad activity against both parasites and certain viruses, though it is primarily used for parasitic gut infections." ]}
 ];
 
 const DRUG_NAMES = DRUGS.map(d => d.name);
@@ -2879,6 +3968,61 @@ const storageAdapter = {
   }
 };
 
+// Cross-player daily distribution, backed by Firestore (see the firebaseConfig
+// script block above). This works on ANY host, including the live rxordle.org
+// site, since Firestore is a real internet service rather than something tied
+// to Claude's preview environment. If Firebase isn't configured (or the write
+// fails, e.g. no internet), these calls just return null and the percentile UI
+// is skipped -- nothing else in the game depends on it.
+function dailyDistDocRef(dateStr){
+  if(!window.rxordleDb) return null;
+  return window.rxordleDb.collection('dailyResults').doc(dateStr);
+}
+
+// Records this completion into the shared daily distribution for the puzzle's
+// date using an atomic server-side increment, so concurrent completions from
+// different players can never overwrite each other's counts.
+async function recordDailyResult(dateStr, won, usedClues){
+  const docRef = dailyDistDocRef(dateStr);
+  if(!docRef) return null;
+  const bucket = won ? String(usedClues) : 'lost';
+  try{
+    await docRef.set({
+      counts: { [bucket]: firebase.firestore.FieldValue.increment(1) }
+    }, { merge: true });
+    const snap = await docRef.get();
+    const dist = snap.exists ? snap.data() : { counts: {} };
+    return { dist, myBucket: bucket };
+  }catch(e){
+    console.warn('Could not record daily result to Firestore', e);
+    return null;
+  }
+}
+
+// Lower score = better performance. A win in fewer clues beats a win in more
+// clues; any win beats a loss.
+function scoreRank(bucket){ return bucket === 'lost' ? 7 : Number(bucket); }
+
+function computePercentile(dist, myBucket){
+  const counts = (dist && dist.counts) || {};
+  let total = 0, worseThanMe = 0;
+  Object.keys(counts).forEach(k => {
+    const c = counts[k] || 0;
+    total += c;
+    if(scoreRank(k) > scoreRank(myBucket)) worseThanMe += c;
+  });
+  if(total <= 0) return null;
+  return { total, pctBeat: Math.round((worseThanMe / total) * 100) };
+}
+
+function buildPercentileText(pctResult, dateStr){
+  if(!pctResult) return null;
+  const { total, pctBeat } = pctResult;
+  const label = (dateStr === TODAY) ? "today's" : "this puzzle's";
+  if(total <= 1) return '\u{1F31F} You\u2019re the first to complete ' + label + ' Rxordle so far!';
+  return '\u{1F3C6} You beat ' + pctBeat + '% of ' + label + ' ' + total + ' players.';
+}
+
 // ---------- Date helpers ----------
 function fmtDate(d){
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -2902,7 +4046,8 @@ function drugForDate(dateStr){
 // different therapeutic area. Keys are 'YYYY-MM-DD', values must exactly
 // match a drug's "name" field in the DRUGS array.
 const DATE_OVERRIDES = {
-  '2026-07-07': 'Furosemide'
+  '2026-07-07': 'Furosemide',
+  '2026-07-08': 'Doxycycline'
 };
 const TODAY = todayStr();
 const ARCHIVE_DAYS = 30; // how many past days to list in the archive
@@ -3136,6 +4281,7 @@ const modalIcon = document.getElementById('modalIcon');
 const modalTitle = document.getElementById('modalTitle');
 const modalSub = document.getElementById('modalSub');
 const modalShareWrap = document.getElementById('modalShareWrap');
+const modalPercentileWrap = document.getElementById('modalPercentileWrap');
 const modalLearnMoreWrap = document.getElementById('modalLearnMoreWrap');
 const modalClose = document.getElementById('modalClose');
 const modalContinue = document.getElementById('modalContinue');
@@ -3212,6 +4358,13 @@ function render(){
     banner.className = 'banner win';
     banner.innerHTML = (ctx.practice ? "<strong>Practice round</strong> \u2014 it's " : "You got it! It's ")+"<strong>"+displayName(ctx.drug.name)+"</strong> ("+ctx.drug.cls+").<span class='sub'>Solved in "+usedClues+" of 6 clues.</span>";
     bannerWrap.appendChild(banner);
+    if(!ctx.practice && ctx.state.percentileText){
+      const pctLine = document.createElement('p');
+      pctLine.id = 'percentileLine';
+      pctLine.className = 'percentile-line';
+      pctLine.textContent = ctx.state.percentileText;
+      bannerWrap.appendChild(pctLine);
+    }
     if(!ctx.practice) bannerWrap.appendChild(buildShareBox(usedClues, true));
     bannerWrap.appendChild(buildPracticeControls());
     learnMoreWrap.appendChild(buildLearnMoreBlock());
@@ -3222,6 +4375,13 @@ function render(){
     banner.className = 'banner lose';
     banner.innerHTML = (ctx.practice ? "<strong>Practice round</strong> \u2014 out of clues. " : "Out of clues. ")+"The answer was <strong>"+displayName(ctx.drug.name)+"</strong> ("+ctx.drug.cls+").";
     bannerWrap.appendChild(banner);
+    if(!ctx.practice && ctx.state.percentileText){
+      const pctLine = document.createElement('p');
+      pctLine.id = 'percentileLine';
+      pctLine.className = 'percentile-line';
+      pctLine.textContent = ctx.state.percentileText;
+      bannerWrap.appendChild(pctLine);
+    }
     if(!ctx.practice) bannerWrap.appendChild(buildShareBox(6, false));
     bannerWrap.appendChild(buildPracticeControls());
     learnMoreWrap.appendChild(buildLearnMoreBlock());
@@ -3352,6 +4512,8 @@ async function showResultModal(won){
     ? "It's " + displayName(ctx.drug.name) + " (" + ctx.drug.cls + "). Solved in " + usedClues + " of 6 clues."
     : "The answer was " + displayName(ctx.drug.name) + " (" + ctx.drug.cls + ").";
   modalShareWrap.innerHTML = '';
+  modalPercentileWrap.style.display = 'none';
+  modalPercentileWrap.textContent = '';
   if(ctx.practice){
     const note = document.createElement('p');
     note.className = 'practice-note';
@@ -3374,6 +4536,19 @@ async function showResultModal(won){
       setTimeout(() => showToast('\u{1F48A} +' + result.xpGained + ' XP earned!', 'xp-toast'), xpDelay);
       if(result.leveledUp){
         setTimeout(() => showToast('\u2728 Level up! You reached level ' + result.newLevel, 'level-toast'), xpDelay + 3400);
+      }
+    }
+
+    const dailyResult = await recordDailyResult(ctx.date, won, usedClues);
+    if(dailyResult){
+      const pct = computePercentile(dailyResult.dist, dailyResult.myBucket);
+      const pctText = buildPercentileText(pct, ctx.date);
+      if(pctText){
+        ctx.state.percentileText = pctText;
+        await saveGame();
+        modalPercentileWrap.textContent = pctText;
+        modalPercentileWrap.style.display = 'block';
+        render(); // refresh the inline card so its banner also shows the percentile line
       }
     }
   }

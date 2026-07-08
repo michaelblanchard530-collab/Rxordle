@@ -509,6 +509,35 @@
     border-radius:20px;
   }
 
+  /* Player rank badge */
+  .player-badge{
+    position:fixed;
+    top:14px;
+    right:14px;
+    z-index:120;
+    display:flex;
+    align-items:center;
+    gap:0.35rem;
+    padding:0.4rem 0.75rem;
+    border-radius:20px;
+    font-size:0.78rem;
+    font-weight:700;
+    color:#fff;
+    box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    cursor:pointer;
+    user-select:none;
+    animation:badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes badgePop{
+    0%{ transform:scale(0); opacity:0; }
+    60%{ transform:scale(1.12); opacity:1; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+  .player-badge.badge-gold{ background:linear-gradient(135deg,#F4C542,#C9971E); }
+  .player-badge.badge-silver{ background:linear-gradient(135deg,#C7CDD6,#8E97A3); }
+  .player-badge.badge-bronze{ background:linear-gradient(135deg,#D79A5D,#A96A2E); }
+  .player-badge.badge-star{ background:linear-gradient(135deg,#1E9C86,#0F6E5C); }
+
   /* Percentile */
   .percentile-line{
     margin:0.7rem 0 0;
@@ -712,6 +741,8 @@
   <div class="rx-mark">℞</div>
   <h1>Rxordle</h1>
 </div>
+
+<div class="player-badge" id="playerBadge" style="display:none;"></div>
 
 <div class="wrap">
   <div class="tabs">
@@ -4023,6 +4054,96 @@ function buildPercentileText(pctResult, dateStr){
   return '\u{1F3C6} You beat ' + pctBeat + '% of ' + label + ' ' + total + ' players.';
 }
 
+// ---------- Global leaderboard & rank badge ----------
+// Ranks the player against every other player's all-time XP (not just today's
+// puzzle) using the 'leaderboard' Firestore collection. Each browser gets a
+// random, anonymous, persistent player ID (no accounts/login involved) stored
+// in personal storage, used only as a document key for this comparison.
+const PLAYER_ID_KEY = 'rxordle-player-id';
+const LAST_BADGE_KEY = 'rxordle-last-badge';
+
+async function getOrCreatePlayerId(){
+  let id = await storageAdapter.get(PLAYER_ID_KEY);
+  if(!id){
+    id = (window.crypto && window.crypto.randomUUID)
+      ? window.crypto.randomUUID()
+      : ('p-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+    await storageAdapter.set(PLAYER_ID_KEY, id);
+  }
+  return id;
+}
+
+// Badge tiers, checked from most to least exclusive.
+function badgeForRank(rank){
+  if(rank === 1) return { label: '#1 Player', icon: '\u{1F451}', cls: 'badge-gold' };
+  if(rank <= 5)  return { label: 'Top 5',      icon: '\u{1F947}', cls: 'badge-gold' };
+  if(rank <= 10) return { label: 'Top 10',     icon: '\u{1F948}', cls: 'badge-silver' };
+  if(rank <= 25) return { label: 'Top 25',     icon: '\u{1F949}', cls: 'badge-bronze' };
+  if(rank <= 50) return { label: 'Top 50',     icon: '\u2B50',    cls: 'badge-star' };
+  return null;
+}
+
+function renderPlayerBadge(rankInfo){
+  const el = document.getElementById('playerBadge');
+  if(!el) return;
+  if(!rankInfo){ el.style.display = 'none'; return; }
+  const info = badgeForRank(rankInfo.rank);
+  if(!info){ el.style.display = 'none'; return; }
+  el.className = 'player-badge ' + info.cls;
+  el.innerHTML = info.icon + ' <span>' + info.label + '</span>';
+  el.title = 'Rank #' + rankInfo.rank + (rankInfo.totalPlayers ? (' of ' + rankInfo.totalPlayers + ' players') : '') + ' by all-time XP. Tap for details.';
+  el.onclick = () => {
+    showToast(info.icon + ' Rank #' + rankInfo.rank + (rankInfo.totalPlayers ? (' of ' + rankInfo.totalPlayers) : '') + ' players by all-time XP', 'level-toast');
+  };
+  el.style.display = 'flex';
+}
+
+// Writes this player's current XP to the shared leaderboard, then counts how
+// many players have strictly more XP to determine rank. A single count()
+// aggregation query keeps this cheap regardless of how many players there are.
+async function updateLeaderboardAndGetRank(totalXP){
+  if(!window.rxordleDb) return null;
+  try{
+    const playerId = await getOrCreatePlayerId();
+    const leaderboardRef = window.rxordleDb.collection('leaderboard');
+    await leaderboardRef.doc(playerId).set({
+      xp: totalXP,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+
+    const higherSnap = await leaderboardRef.where('xp', '>', totalXP).count().get();
+    const higherCount = higherSnap.data().count;
+    const totalSnap = await leaderboardRef.count().get();
+    const totalPlayers = totalSnap.data().count;
+
+    const rankInfo = { rank: higherCount + 1, totalPlayers };
+    await storageAdapter.set(LAST_BADGE_KEY, JSON.stringify(rankInfo));
+    return rankInfo;
+  }catch(e){
+    console.warn('Could not update/read leaderboard rank from Firestore', e);
+    return null;
+  }
+}
+
+// Shows a cached badge immediately on load (so returning players see it
+// without waiting on a network round trip), then refreshes it in the
+// background using their current XP total.
+async function initPlayerBadge(){
+  try{
+    const cachedRaw = await storageAdapter.get(LAST_BADGE_KEY);
+    if(cachedRaw){
+      renderPlayerBadge(JSON.parse(cachedRaw));
+    }
+  }catch(e){}
+  try{
+    const stats = await loadStats();
+    if(stats.totalXP > 0){
+      const rankInfo = await updateLeaderboardAndGetRank(stats.totalXP);
+      if(rankInfo) renderPlayerBadge(rankInfo);
+    }
+  }catch(e){}
+}
+
 // ---------- Date helpers ----------
 function fmtDate(d){
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -4571,6 +4692,9 @@ async function showResultModal(won){
       if(result.leveledUp){
         setTimeout(() => showToast('\u2728 Level up! You reached level ' + result.newLevel, 'level-toast'), xpDelay + 3400);
       }
+      updateLeaderboardAndGetRank(result.stats.totalXP).then(rankInfo => {
+        if(rankInfo) renderPlayerBadge(rankInfo);
+      });
     }
 
     const dailyResult = await recordDailyResult(ctx.date, won, usedClues);
@@ -4842,6 +4966,7 @@ async function renderArchiveList(){
 }
 
 loadGame(TODAY);
+initPlayerBadge();
 </script>
 </body>
 </html>

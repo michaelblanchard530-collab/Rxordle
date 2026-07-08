@@ -45,6 +45,7 @@
     --navy:#132A4C;
     --navy-deep:#0E2038;
     --ink:#16233F;
+    --heading:#132A4C;
     --page-bg:#EEF2F8;
     --card:#FFFFFF;
     --clue-bg:#E9F1FB;
@@ -69,6 +70,7 @@
     --navy:#1C3155;
     --navy-deep:#0A1524;
     --ink:#E7ECF5;
+    --heading:#EAF2FF;
     --page-bg:#0B1420;
     --card:#141F32;
     --clue-bg:#1B2A44;
@@ -96,6 +98,9 @@
   html[data-theme="dark"] .archive-item{ background:#0F1826; }
   html[data-theme="dark"] .stat-card{ background:var(--clue-bg); }
   html[data-theme="dark"] .xp-block{ background:var(--card); border-color:var(--border); }
+  html[data-theme="dark"] .tab-btn{ background:var(--card); color:var(--ink); }
+  html[data-theme="dark"] .tab-btn.active{ background:var(--teal-dark); color:#fff; }
+  html[data-theme="dark"] .learnmore-btn{ background:var(--card); }
   *{box-sizing:border-box;}
   body{
     margin:0;
@@ -167,7 +172,7 @@
     text-align:center;
     font-size:1.5rem;
     margin:0 0 0.4rem;
-    color:var(--navy);
+    color:var(--heading);
     font-weight:600;
   }
   .subrule{
@@ -230,7 +235,7 @@
     width:24px;height:24px;
     border-radius:50%;
     background:var(--clue-num-bg);
-    color:var(--navy);
+    color:var(--heading);
     font-weight:700;
     font-size:0.8rem;
     display:flex;align-items:center;justify-content:center;
@@ -477,7 +482,7 @@
     font-family:'Lora',serif;
     font-size:1.3rem;
     margin:0 0 0.35rem;
-    color:var(--navy);
+    color:var(--heading);
   }
   .modal-box p{
     font-size:0.92rem;
@@ -568,7 +573,7 @@
   .settings-modal h3{
     font-family:'Lora',serif;
     font-size:1.25rem;
-    color:var(--navy);
+    color:var(--heading);
     margin:0 0 1.1rem;
     text-align:center;
   }
@@ -703,8 +708,8 @@
     padding:0.6rem;
     border:1.5px solid var(--navy);
     border-radius:10px;
-    background:#fff;
-    color:var(--navy);
+    background:var(--card);
+    color:var(--heading);
     font-weight:600;
     font-size:0.88rem;
     cursor:pointer;
@@ -806,7 +811,7 @@
     font-family:'Lora',serif;
     font-size:1.6rem;
     font-weight:700;
-    color:var(--navy);
+    color:var(--heading);
     line-height:1.1;
   }
   .stat-card .lbl{
@@ -831,7 +836,7 @@
   .xp-block .xp-level{
     font-family:'Lora',serif;
     font-weight:700;
-    color:var(--navy);
+    color:var(--heading);
     font-size:1.05rem;
   }
   .xp-block .xp-count{

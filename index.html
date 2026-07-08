@@ -4111,10 +4111,14 @@ async function updateLeaderboardAndGetRank(totalXP){
       updatedAt: new Date().toISOString()
     }, { merge: true });
 
-    const higherSnap = await leaderboardRef.where('xp', '>', totalXP).count().get();
-    const higherCount = higherSnap.data().count;
-    const totalSnap = await leaderboardRef.count().get();
-    const totalPlayers = totalSnap.data().count;
+    // Fetch matching docs directly and count client-side rather than using
+    // the count() aggregation query, which isn't available in every SDK/
+    // bundle configuration. Fine at this scale (tens to low hundreds of
+    // players); would need revisiting if the player base grew very large.
+    const higherSnap = await leaderboardRef.where('xp', '>', totalXP).get();
+    const higherCount = higherSnap.size;
+    const totalSnap = await leaderboardRef.get();
+    const totalPlayers = totalSnap.size;
 
     const rankInfo = { rank: higherCount + 1, totalPlayers };
     await storageAdapter.set(LAST_BADGE_KEY, JSON.stringify(rankInfo));

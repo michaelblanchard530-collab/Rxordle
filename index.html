@@ -4180,6 +4180,15 @@ const storageAdapter = {
   }
 };
 
+// ---------- Google Analytics event tracking ----------
+// gtag() is defined by the GA4 snippet at the top of <head>. Wrapped so a
+// missing/blocked GA script (ad blockers, etc.) can never break gameplay.
+function trackEvent(name, params){
+  try{
+    if(typeof gtag === 'function') gtag('event', name, params || {});
+  }catch(e){ /* analytics unavailable; never let this affect the game */ }
+}
+
 // Cross-player daily distribution, backed by Firestore (see the firebaseConfig
 // script block above). This works on ANY host, including the live rxordle.org
 // site, since Firestore is a real internet service rather than something tied
@@ -4401,6 +4410,7 @@ const ARCHIVE_DAYS = 30; // how many past days to list in the archive
 // ---------- Active game context ----------
 // ---------- Settings state ----------
 let soundEnabled = true; // overwritten by initSettings() from saved preference
+let firstGuessTracked = false; // GA4 fires 'first_guess' once per page load
 
 let ctx = {
   date: TODAY,
@@ -4512,6 +4522,7 @@ function activeState(){
 function startPractice(){
   ctx.practice = true;
   ctx.practiceState = { guesses: [], status: 'playing' };
+  trackEvent('practice_started', { date: ctx.date });
   render();
 }
 function exitPractice(){
@@ -4683,6 +4694,7 @@ soundToggle.addEventListener('change', () => {
 });
 
 settingsShareBtn.addEventListener('click', async () => {
+  trackEvent('share_site_clicked', {});
   const shareUrl = 'https://rxordle.org/';
   const shareData = {
     title: 'Rxordle',
@@ -4907,6 +4919,7 @@ function buildShareBox(usedClues, won){
   };
 
   btn.onclick = () => {
+    trackEvent('share_result_clicked', {});
     // navigator.clipboard can be entirely absent (insecure context, older
     // browser, some embedded/sandboxed views) -- calling .writeText on
     // undefined would throw synchronously and skip the .catch() below,
@@ -4949,6 +4962,7 @@ async function showResultModal(won){
   modalOverlay.classList.add('open');
 
   if(won){ celebrateWin(); } else { playLoseSound(); }
+  trackEvent(won ? 'game_won' : 'game_lost', { clues_used: usedClues, practice: ctx.practice, is_today: ctx.date === TODAY });
 
   if(!ctx.practice){
     const result = await recordCompletion(won, usedClues);
@@ -4957,6 +4971,7 @@ async function showResultModal(won){
       setTimeout(() => showToast('\u{1F48A} +' + result.xpGained + ' XP earned!', 'xp-toast'), xpDelay);
       if(result.leveledUp){
         setTimeout(() => showToast('\u2728 Level up! You reached level ' + result.newLevel, 'level-toast'), xpDelay + 3400);
+        trackEvent('level_up', { new_level: result.newLevel });
       }
       updateLeaderboardAndGetRank(result.stats.totalXP).then(rankInfo => {
         if(rankInfo) renderPlayerBadge(rankInfo);
@@ -5102,6 +5117,10 @@ function submitGuess(){
   }
   hintText.textContent = '';
   hintText.classList.remove('err');
+  if(!firstGuessTracked){
+    firstGuessTracked = true;
+    trackEvent('first_guess', { practice: ctx.practice });
+  }
 
   let justFinished = null;
   if(match.toLowerCase() === ctx.drug.name.toLowerCase()){

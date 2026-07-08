@@ -3916,6 +3916,28 @@ const DRUGS = [
     "It has broad activity against both parasites and certain viruses, though it is primarily used for parasitic gut infections." ]}
 ];
 
+// ---------- Selection weighting ----------
+// Drugs were added to this list in five rounds, roughly from "most commonly
+// prescribed medications overall" down to "increasingly specialized/niche"
+// (ICU-only drugs, oncology agents, toxicology antidotes, transplant
+// immunosuppressants, etc). Rather than hand-tagging all 439 entries
+// individually, weight is assigned by which round a drug belongs to, using
+// each round's known index range. Higher weight = picked more often as the
+// daily answer. Tune TIER_WEIGHTS below to make common drugs show up more or
+// less dominantly; ranges must be updated if drugs are ever inserted rather
+// than appended.
+const TIER_RANGES = [
+  { end: 40,  weight: 10 }, // indices 0-39:   original core "top 300" list
+  { end: 99,  weight: 6  }, // indices 40-98:  round 2 (classmates for difficulty)
+  { end: 184, weight: 4  }, // indices 99-183: round 3 (broader common drugs)
+  { end: 289, weight: 2  }, // indices 184-288: round 4 (ICU/specialty)
+  { end: 439, weight: 1  }  // indices 289-438: round 5 (oncology/transplant/toxicology/niche)
+];
+DRUGS.forEach((d, i) => {
+  const tier = TIER_RANGES.find(t => i < t.end);
+  d.weight = tier ? tier.weight : 1;
+});
+
 const DRUG_NAMES = DRUGS.map(d => d.name);
 
 // ---------- Brand names ----------
@@ -4159,15 +4181,21 @@ function hashStr(s){
   return Math.abs(h);
 }
 // Each date's drug is decided ONCE and locked in permanently via Firestore,
-// rather than recalculated live from (hash % DRUGS.length) -- that live
+// rather than recalculated live from a weighted pick over DRUGS -- that live
 // calculation is only used as (a) the value written the very first time a
 // date is ever requested by anyone, and (b) a fallback if Firestore is
 // unavailable (offline, not configured, rules misconfigured, etc.), in which
 // case stability across future pool growth can't be guaranteed for that
 // session, but the game still works.
 function computeLiveHashDrug(dateStr){
-  const idx = hashStr(dateStr) % DRUGS.length;
-  return DRUGS[idx];
+  const totalWeight = DRUGS.reduce((sum, d) => sum + (d.weight || 1), 0);
+  let r = hashStr(dateStr) % totalWeight;
+  for(const d of DRUGS){
+    const w = d.weight || 1;
+    if(r < w) return d;
+    r -= w;
+  }
+  return DRUGS[DRUGS.length - 1]; // fallback, should not normally be reached
 }
 async function drugForDate(dateStr){
   const overrideName = DATE_OVERRIDES[dateStr];

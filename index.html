@@ -4346,7 +4346,20 @@ function todayStr(){ return fmtDate(new Date()); }
 function hashStr(s){
   let h = 0;
   for(let i=0;i<s.length;i++){ h = (h<<5) - h + s.charCodeAt(i); h |= 0; }
-  return Math.abs(h);
+  // The raw rolling hash above is nearly linear for strings that share a long
+  // common prefix and differ only in their last character(s) -- exactly what
+  // consecutive date strings like "2026-07-08" vs "2026-07-09" look like.
+  // That caused daily selections to drift through the drug list in
+  // near-sequential order instead of jumping around unpredictably. This
+  // finalizer (MurmurHash3's 32-bit mix function) scrambles the bits so a
+  // tiny input change produces a large, unpredictable output change.
+  h = h >>> 0; // treat as unsigned 32-bit
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return h >>> 0;
 }
 // Each date's drug is decided ONCE and locked in permanently via Firestore,
 // rather than recalculated live from a weighted pick over DRUGS -- that live

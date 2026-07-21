@@ -100,6 +100,7 @@
   html[data-theme="dark"] .xp-block{ background:var(--card); border-color:var(--border); }
   html[data-theme="dark"] .tab-btn{ background:var(--card); color:var(--ink); }
   html[data-theme="dark"] .tab-btn.active{ background:var(--teal-dark); color:#fff; }
+  html[data-theme="dark"] .tab-btn-new{ color:#6FE6C8; border-color:#2FCBAA; }
   html[data-theme="dark"] .learnmore-btn{ background:var(--card); }
   *{box-sizing:border-box;}
   body{
@@ -144,6 +145,7 @@
     gap:0.4rem;
     justify-content:center;
     margin-bottom:1rem;
+    flex-wrap:wrap;
   }
   .tab-btn{
     padding:0.45rem 1.1rem;
@@ -160,6 +162,23 @@
     background:var(--navy);
     color:#fff;
     border-color:var(--navy);
+  }
+  .tab-btn-new{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    border-color:#2FCBAA;
+    color:#0F6E5C;
+  }
+  .tab-btn-new:hover{ background:var(--teal-tint); }
+  .new-badge{
+    background:#2FCBAA;
+    color:#08221C;
+    font-size:0.62rem;
+    font-weight:800;
+    letter-spacing:0.03em;
+    padding:0.12rem 0.4rem;
+    border-radius:20px;
   }
   .card{
     background:var(--card);
@@ -860,6 +879,170 @@
 
   ::-webkit-scrollbar{ width:8px; }
   ::-webkit-scrollbar-thumb{ background:#CBD5E4; border-radius:4px; }
+  /* ---------- Game switcher (Rxordle / Connections) ---------- */
+  .game-switch{
+    display:flex;
+    gap:0.5rem;
+    justify-content:center;
+    margin-bottom:1.2rem;
+  }
+  .game-switch-btn{
+    padding:0.55rem 1.3rem;
+    border-radius:24px;
+    border:1.5px solid var(--border);
+    background:var(--card);
+    color:var(--muted);
+    font-weight:700;
+    font-size:0.9rem;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+  }
+  .game-switch-btn.active{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+  }
+  html[data-theme="dark"] .game-switch-btn{ background:var(--card); color:var(--ink); }
+  html[data-theme="dark"] .game-switch-btn.active{ background:var(--teal-dark); color:#fff; }
+
+  /* ---------- Medical Connections: category colors ---------- */
+  :root{
+    --yellow-bg:#F4D35E; --yellow-text:#5C4A05;
+    --green-bg:#7FBF7F;  --green-text:#1B4D1B;
+    --blue-bg:#7FA8D9;   --blue-text:#0F2E52;
+    --purple-bg:#B18AD1; --purple-text:#3C1F52;
+  }
+  html[data-theme="dark"]{
+    --yellow-bg:#8A7124; --yellow-text:#FFF6DC;
+    --green-bg:#2C5A2C;  --green-text:#DFF3DF;
+    --blue-bg:#2C4A6E;   --blue-text:#DCEBFF;
+    --purple-bg:#5B3E75; --purple-text:#F1E3FB;
+  }
+
+  .instructions{
+    text-align:center;
+    font-size:0.85rem;
+    color:var(--muted);
+    margin:0 0 1.2rem;
+  }
+  .solved-groups{ margin-bottom:0.6rem; }
+  .solved-row{
+    border-radius:10px;
+    padding:0.75rem 0.9rem;
+    margin-bottom:0.6rem;
+    text-align:center;
+    animation:solvedIn 0.4s ease;
+  }
+  @keyframes solvedIn{ from{ opacity:0; transform:scale(0.9); } to{ opacity:1; transform:scale(1); } }
+  .solved-row.no-anim{ animation:none; }
+  .solved-row .cat{
+    font-weight:700;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    margin-bottom:0.15rem;
+  }
+  .solved-row .items{ font-size:0.82rem; font-weight:500; }
+  .solved-row.yellow{ background:var(--yellow-bg); color:var(--yellow-text); }
+  .solved-row.green{ background:var(--green-bg); color:var(--green-text); }
+  .solved-row.blue{ background:var(--blue-bg); color:var(--blue-text); }
+  .solved-row.purple{ background:var(--purple-bg); color:var(--purple-text); }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:0.5rem;
+    margin-bottom:1rem;
+  }
+  .tile{
+    aspect-ratio:1.25 / 1;
+    background:var(--clue-bg);
+    border:1.5px solid var(--clue-border);
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:0.78rem;
+    font-weight:700;
+    color:var(--ink);
+    cursor:pointer;
+    padding:0.35rem;
+    user-select:none;
+    transition:transform 0.12s ease, background 0.15s ease, color 0.15s ease;
+    line-height:1.2;
+  }
+  .tile:hover{ transform:translateY(-2px); }
+  .tile.selected{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+  }
+  html[data-theme="dark"] .tile.selected{ background:var(--teal); color:#0A1524; border-color:var(--teal); }
+  .tile.shake{ animation:tileShake 0.55s ease; }
+  @keyframes tileShake{
+    0%,100%{ transform:translateX(0); }
+    10%{ transform:translateX(-9px); }
+    20%{ transform:translateX(9px); }
+    30%{ transform:translateX(-9px); }
+    40%{ transform:translateX(9px); }
+    50%{ transform:translateX(-7px); }
+    60%{ transform:translateX(7px); }
+    70%{ transform:translateX(-5px); }
+    80%{ transform:translateX(5px); }
+    90%{ transform:translateX(-2px); }
+  }
+
+  .mistakes-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0.5rem;
+    margin-bottom:1rem;
+    font-size:0.8rem;
+    color:var(--muted);
+  }
+  .mistake-dots{ display:flex; gap:6px; }
+  .mistake-dot{
+    width:11px; height:11px;
+    border-radius:50%;
+    background:var(--clue-bg);
+    border:1.5px solid var(--clue-border);
+  }
+  .mistake-dot.used{ background:#C0392B; border-color:#8C2A2A; }
+
+  .hint-msg{
+    text-align:center;
+    font-size:0.82rem;
+    font-weight:600;
+    color:var(--fail-text);
+    min-height:1.2em;
+    margin-bottom:0.6rem;
+  }
+
+  .controls{
+    display:flex;
+    gap:0.5rem;
+    justify-content:center;
+  }
+  .ctrl-btn{
+    padding:0.55rem 1rem;
+    border-radius:24px;
+    border:1.5px solid var(--navy);
+    background:var(--card);
+    color:var(--heading);
+    font-weight:600;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  .ctrl-btn:hover{ background:var(--clue-bg); }
+  .ctrl-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .ctrl-btn.primary{ background:var(--navy); color:#fff; }
+  .ctrl-btn.primary:hover{ background:var(--navy-deep); }
+  .ctrl-btn.primary:disabled{ background:#AEB8C6; border-color:#AEB8C6; color:#fff; }
 </style>
 </head>
 <body>
@@ -873,6 +1056,12 @@
 <button class="settings-btn" id="settingsBtn" aria-label="Settings" title="Settings">⚙️</button>
 
 <div class="wrap">
+  <div class="game-switch">
+    <button class="game-switch-btn active" id="switchRxordle">℞ Rxordle</button>
+    <button class="game-switch-btn" id="switchConnections">Connections<span class="new-badge">NEW</span></button>
+  </div>
+
+  <div id="rxordleApp">
   <div class="tabs">
     <button class="tab-btn active" id="tabToday">Today</button>
     <button class="tab-btn" id="tabArchive">Archive</button>
@@ -923,6 +1112,52 @@
     <h2>Your stats</h2>
     <div class="subrule"></div>
     <div id="statsPanel"></div>
+  </div>
+  </div>
+
+  <div id="connectionsApp" style="display:none;">
+  <div class="tabs">
+    <button class="tab-btn active" id="mcTabToday">Today</button>
+    <button class="tab-btn" id="mcTabArchive">Archive</button>
+    <button class="tab-btn" id="mcTabStats">Stats</button>
+  </div>
+
+  <div class="card" id="mcGameCard">
+    <h2 id="mcCardTitle">Find the groups</h2>
+    <div class="subrule"></div>
+    <div class="instructions">Select four items that share a connection.</div>
+    <div class="daytag" id="mcDaytag"></div>
+
+    <div class="solved-groups" id="mcSolvedGroups"></div>
+    <div class="grid" id="mcGrid"></div>
+    <div class="hint-msg" id="mcHintMsg"></div>
+
+    <div class="mistakes-row">
+      <span>Mistakes remaining:</span>
+      <div class="mistake-dots" id="mcMistakeDots"></div>
+    </div>
+
+    <div class="controls" id="mcControlsRow">
+      <button class="ctrl-btn" id="mcShuffleBtn">🔀 Shuffle</button>
+      <button class="ctrl-btn" id="mcDeselectBtn">Deselect</button>
+      <button class="ctrl-btn primary" id="mcSubmitBtn" disabled>Submit</button>
+    </div>
+
+    <div id="mcBannerWrap"></div>
+    <div class="footer-note" id="mcFooterNote">New puzzle every day at midnight, local time.</div>
+  </div>
+
+  <div class="card" id="mcArchiveCard" style="display:none;">
+    <h2>Archive</h2>
+    <div class="subrule"></div>
+    <div class="archive-list" id="mcArchiveList"></div>
+  </div>
+
+  <div class="card" id="mcStatsCard" style="display:none;">
+    <h2>Your stats</h2>
+    <div class="subrule"></div>
+    <div class="stats-grid" id="mcStatsGrid"></div>
+  </div>
   </div>
 </div>
 
@@ -5273,9 +5508,1190 @@ async function renderArchiveList(){
   });
 }
 
+// =====================================================================
+// Puzzle bank. Each puzzle has 4 groups (yellow = easiest, purple = hardest
+// / trickiest), each with a category name and 4 items. Real "Connections"
+// puzzles rely on plausible overlap between items across categories for
+// difficulty -- a few of these are built with that kind of trap on purpose
+// (e.g. Sotalol reads like a beta-blocker but is grouped under QT-prolonging
+// drugs instead).
+// =====================================================================
+const PUZZLES = [
+  { title:"Cardiology Categories", groups:[
+    { level:"yellow", category:"Beta blockers", items:["Metoprolol","Atenolol","Bisoprolol","Carvedilol"] },
+    { level:"green", category:"Can cause QT prolongation", items:["Amiodarone","Sotalol","Methadone","Ondansetron"] },
+    { level:"blue", category:"Signs of heart failure", items:["Orthopnea","Edema","Jugular venous distension","Crackles"] },
+    { level:"purple", category:"Eponymous cardiac signs", items:["Austin Flint murmur","Corrigan pulse","Kussmaul sign","Levine sign"] }
+  ]},
+  { title:"In the Blood", groups:[
+    { level:"yellow", category:"Types of anemia", items:["Iron deficiency","Pernicious","Aplastic","Sickle cell"] },
+    { level:"green", category:"Clotting factors (common names)", items:["Fibrinogen","Prothrombin","Christmas factor","Antihemophilic factor"] },
+    { level:"blue", category:"White blood cell types", items:["Neutrophil","Lymphocyte","Eosinophil","Basophil"] },
+    { level:"purple", category:"Blood group systems", items:["Rh","ABO","Kell","Duffy"] }
+  ]},
+  { title:"Say What You See", groups:[
+    { level:"yellow", category:"Skin findings", items:["Petechiae","Purpura","Erythema","Urticaria"] },
+    { level:"green", category:"GI symptoms", items:["Dysphagia","Odynophagia","Hematemesis","Melena"] },
+    { level:"blue", category:"Neuro exam signs", items:["Babinski sign","Romberg sign","Nystagmus","Clonus"] },
+    { level:"purple", category:"Named clinical triads", items:["Cushing's triad","Charcot's triad","Beck's triad","Virchow's triad"] }
+  ]},
+  { title:"Antibiotics", groups:[
+    { level:"yellow", category:"Penicillins", items:["Amoxicillin","Ampicillin","Piperacillin","Nafcillin"] },
+    { level:"green", category:"Macrolides", items:["Azithromycin","Erythromycin","Clarithromycin","Fidaxomicin"] },
+    { level:"blue", category:"Notable for C. difficile risk", items:["Clindamycin","Ciprofloxacin","Cephalexin","Levofloxacin"] },
+    { level:"purple", category:"Originally derived from soil bacteria", items:["Streptomycin","Vancomycin","Rifampin","Neomycin"] }
+  ]},
+  { title:"Endocrine", groups:[
+    { level:"yellow", category:"Thyroid-related medications", items:["Levothyroxine","Liothyronine","Methimazole","Propylthiouracil"] },
+    { level:"green", category:"Diabetes drug class prototypes", items:["Metformin","Glipizide","Sitagliptin","Empagliflozin"] },
+    { level:"blue", category:"Adrenal hormones", items:["Cortisol","Aldosterone","Epinephrine","DHEA"] },
+    { level:"purple", category:"Pituitary hormones", items:["ACTH","TSH","Prolactin","Oxytocin"] }
+  ]},
+  { title:"Psychiatry", groups:[
+    { level:"yellow", category:"SSRIs", items:["Sertraline","Fluoxetine","Escitalopram","Paroxetine"] },
+    { level:"green", category:"Mood stabilizers", items:["Lithium","Valproate","Lamotrigine","Carbamazepine"] },
+    { level:"blue", category:"Cluster B personality disorders", items:["Borderline","Narcissistic","Histrionic","Antisocial"] },
+    { level:"purple", category:"Defense mechanisms", items:["Projection","Denial","Sublimation","Displacement"] }
+  ]},
+  { title:"Bones and Joints", groups:[
+    { level:"yellow", category:"Types of fractures", items:["Greenstick","Comminuted","Spiral","Compression"] },
+    { level:"green", category:"Causes of secondary osteoporosis", items:["Corticosteroids","Hyperthyroidism","Hyperparathyroidism","Immobilization"] },
+    { level:"blue", category:"Carpal bones", items:["Scaphoid","Lunate","Trapezium","Hamate"] },
+    { level:"purple", category:"Eponymous fractures", items:["Colles","Smith","Bennett","Jones"] }
+  ]},
+  { title:"GI System", groups:[
+    { level:"yellow", category:"Causes of pancreatitis", items:["Gallstones","Ethanol","Trauma","Steroids"] },
+    { level:"green", category:"Crohn disease features", items:["Cobblestoning","Skip lesions","Crypt abscesses","Fistulas"] },
+    { level:"blue", category:"Liver function markers", items:["ALT","AST","Bilirubin","Albumin"] },
+    { level:"purple", category:"Named GI exam signs", items:["Murphy's sign","McBurney's point","Rovsing's sign","Courvoisier's sign"] }
+  ]},
+  { title:"Pharm Suffixes", groups:[
+    { level:"yellow", category:"End in \u2011olol (beta blockers)", items:["Metoprolol","Atenolol","Propranolol","Timolol"] },
+    { level:"green", category:"End in \u2011pril (ACE inhibitors)", items:["Lisinopril","Enalapril","Captopril","Ramipril"] },
+    { level:"blue", category:"End in \u2011sartan (ARBs)", items:["Losartan","Valsartan","Irbesartan","Candesartan"] },
+    { level:"purple", category:"End in \u2011statin (statins)", items:["Atorvastatin","Simvastatin","Rosuvastatin","Pravastatin"] }
+  ]},
+  { title:"Infectious Disease", groups:[
+    { level:"yellow", category:"Sexually transmitted infections", items:["Chlamydia","Gonorrhea","Syphilis","Trichomoniasis"] },
+    { level:"green", category:"Tick-borne illnesses", items:["Lyme disease","Rocky Mountain spotted fever","Ehrlichiosis","Babesiosis"] },
+    { level:"blue", category:"Vaccine-preventable diseases", items:["Measles","Pertussis","Tetanus","Varicella"] },
+    { level:"purple", category:"Mosquito-borne illnesses", items:["Malaria","Dengue","Zika","West Nile virus"] }
+  ]},
+  { title:"Renal", groups:[
+    { level:"yellow", category:"Causes of nephrotic syndrome", items:["Minimal change disease","Membranous nephropathy","FSGS","Diabetic nephropathy"] },
+    { level:"green", category:"Electrolytes managed by the kidney", items:["Sodium","Potassium","Calcium","Phosphate"] },
+    { level:"blue", category:"Signs of nephrotic syndrome", items:["Proteinuria","Edema","Hypoalbuminemia","Hyperlipidemia"] },
+    { level:"purple", category:"Eponymous renal structures", items:["Bowman's capsule","Loop of Henle","Ducts of Bellini","Column of Bertin"] }
+  ]},
+  { title:"Obstetrics & Gynecology", groups:[
+    { level:"yellow", category:"Stages of labor landmarks", items:["Effacement","Dilation","Crowning","Engagement"] },
+    { level:"green", category:"Causes of postpartum hemorrhage (4 T's)", items:["Tone","Trauma","Tissue","Thrombin"] },
+    { level:"blue", category:"Pelvis types (Caldwell-Moloy)", items:["Gynecoid","Android","Anthropoid","Platypelloid"] },
+    { level:"purple", category:"Eponymous pregnancy signs", items:["Chadwick sign","Hegar sign","Goodell sign","Braxton Hicks"] }
+  ]},
+  { title:"Dermatology", groups:[
+    { level:"yellow", category:"Primary skin lesions", items:["Macule","Papule","Vesicle","Nodule"] },
+    { level:"green", category:"Autoimmune skin conditions", items:["Psoriasis","Vitiligo","Pemphigus","Bullous pemphigoid"] },
+    { level:"blue", category:"Skin cancer types", items:["Basal cell carcinoma","Squamous cell carcinoma","Melanoma","Merkel cell carcinoma"] },
+    { level:"purple", category:"Named dermatologic signs", items:["Nikolsky sign","Auspitz sign","Koebner phenomenon","Darier sign"] }
+  ]},
+  { title:"Neurology", groups:[
+    { level:"yellow", category:"Cranial nerves", items:["Oculomotor","Trochlear","Abducens","Hypoglossal"] },
+    { level:"green", category:"Types of aphasia", items:["Broca's","Wernicke's","Conduction","Global"] },
+    { level:"blue", category:"Movement disorders", items:["Parkinson disease","Huntington disease","Essential tremor","Dystonia"] },
+    { level:"purple", category:"Eponymous neuro exam signs", items:["Kernig sign","Brudzinski sign","Battle sign","Cullen sign"] }
+  ]},
+  { title:"Pediatrics", groups:[
+    { level:"yellow", category:"Childhood vaccines", items:["MMR","DTaP","Varicella","Hepatitis B"] },
+    { level:"green", category:"Congenital heart defects", items:["Tetralogy of Fallot","Patent ductus arteriosus","Ventricular septal defect","Coarctation of the aorta"] },
+    { level:"blue", category:"Milestones typical by age one", items:["Pincer grasp","Walking","First words","Waving bye-bye"] },
+    { level:"purple", category:"Eponymous pediatric syndromes", items:["Down syndrome","Turner syndrome","Prader-Willi syndrome","Noonan syndrome"] }
+  ]},
+  { title:"Heart Sounds & Murmurs", groups:[
+    { level:"yellow", category:"Systolic murmurs", items:["Aortic stenosis","Mitral regurgitation","Tricuspid regurgitation","Pulmonic stenosis"] },
+    { level:"green", category:"Diastolic murmurs", items:["Aortic regurgitation","Mitral stenosis","Tricuspid stenosis","Pulmonic regurgitation"] },
+    { level:"blue", category:"Normal heart sound components", items:["S1","S2","S3","S4"] },
+    { level:"purple", category:"Descriptive murmur and pulse terms", items:["Blowing","Machine-like","Water-hammer","Rumbling"] }
+  ]},
+  { title:"Cardiac Biomarkers & Tests", groups:[
+    { level:"yellow", category:"Cardiac biomarkers", items:["Troponin","CK-MB","BNP","Myoglobin"] },
+    { level:"green", category:"ECG changes in ischemia", items:["ST elevation","ST depression","T wave inversion","Q waves"] },
+    { level:"blue", category:"Non-invasive cardiac tests", items:["Echocardiogram","Stress test","Holter monitor","Cardiac MRI"] },
+    { level:"purple", category:"Named ECG patterns", items:["Wellens' sign","Osborn wave","Brugada pattern","De Winter T waves"] }
+  ]},
+  { title:"Arrhythmias", groups:[
+    { level:"yellow", category:"Supraventricular arrhythmias", items:["Atrial fibrillation","Atrial flutter","AVNRT","Multifocal atrial tachycardia"] },
+    { level:"green", category:"Ventricular arrhythmias", items:["Ventricular tachycardia","Ventricular fibrillation","Torsades de pointes","PVCs"] },
+    { level:"blue", category:"AV block types", items:["First degree","Mobitz I","Mobitz II","Third degree"] },
+    { level:"purple", category:"Named arrhythmia syndromes", items:["Wolff-Parkinson-White","Long QT syndrome","Brugada syndrome","Lown-Ganong-Levine"] }
+  ]},
+  { title:"Heart Failure Management", groups:[
+    { level:"yellow", category:"Guideline-directed HFrEF therapy classes", items:["ACE inhibitor","Beta blocker","Aldosterone antagonist","SGLT2 inhibitor"] },
+    { level:"green", category:"Signs of volume overload", items:["Rales","Edema","Ascites","Elevated JVP"] },
+    { level:"blue", category:"NYHA functional classes", items:["Class I","Class II","Class III","Class IV"] },
+    { level:"purple", category:"Devices used in heart failure", items:["Pacemaker","ICD","CRT","LVAD"] }
+  ]},
+  { title:"Congenital Heart Disease", groups:[
+    { level:"yellow", category:"Cyanotic heart defects", items:["Tetralogy of Fallot","Transposition of the great arteries","Truncus arteriosus","Tricuspid atresia"] },
+    { level:"green", category:"Left-to-right shunt defects", items:["VSD","ASD","PDA","AV canal defect"] },
+    { level:"blue", category:"Components of Tetralogy of Fallot", items:["Pulmonic stenosis","RV hypertrophy","Overriding aorta","VSD component"] },
+    { level:"purple", category:"Syndromes associated with heart defects", items:["DiGeorge syndrome","Down syndrome","Turner syndrome","Marfan syndrome"] }
+  ]},
+  { title:"Vascular Disease", groups:[
+    { level:"yellow", category:"Peripheral artery disease features", items:["Claudication","Diminished pulses","Pallor on elevation","Hair loss"] },
+    { level:"green", category:"Aortic pathology", items:["Aneurysm","Dissection","Coarctation","Aortitis"] },
+    { level:"blue", category:"Types of shock", items:["Cardiogenic","Hypovolemic","Distributive","Obstructive"] },
+    { level:"purple", category:"Named vascular exam signs", items:["Homans' sign","Allen's test","Buerger's test","Trousseau's sign"] }
+  ]},
+  { title:"Antiarrhythmics & Anticoagulation", groups:[
+    { level:"yellow", category:"Class I antiarrhythmics", items:["Lidocaine","Flecainide","Procainamide","Quinidine"] },
+    { level:"green", category:"Direct oral anticoagulants", items:["Apixaban","Rivaroxaban","Dabigatran","Edoxaban"] },
+    { level:"blue", category:"Anticoagulant reversal agents", items:["Vitamin K","Protamine","Idarucizumab","Andexanet alfa"] },
+    { level:"purple", category:"Molecular targets of anticoagulants", items:["Factor Xa","Thrombin","Vitamin K epoxide reductase","Antithrombin"] }
+  ]},
+  { title:"Cardiac Anatomy", groups:[
+    { level:"yellow", category:"Coronary arteries", items:["LAD","RCA","LCX","Left main"] },
+    { level:"green", category:"Heart chambers", items:["Right atrium","Right ventricle","Left atrium","Left ventricle"] },
+    { level:"blue", category:"Cardiac conduction system", items:["SA node","AV node","Bundle of His","Purkinje fibers"] },
+    { level:"purple", category:"Heart valves", items:["Mitral","Tricuspid","Aortic","Pulmonic"] }
+  ]},
+  { title:"Obstructive vs Restrictive Lung Disease", groups:[
+    { level:"yellow", category:"Obstructive lung diseases", items:["COPD","Asthma","Bronchiectasis","Cystic fibrosis"] },
+    { level:"green", category:"Restrictive lung diseases", items:["Pulmonary fibrosis","Sarcoidosis","Kyphoscoliosis","Obesity hypoventilation"] },
+    { level:"blue", category:"Pulmonary function test values", items:["FEV1","FVC","TLC","DLCO"] },
+    { level:"purple", category:"Occupational lung diseases", items:["Asbestosis","Silicosis","Coal worker's pneumoconiosis","Berylliosis"] }
+  ]},
+  { title:"Chest X-ray Findings", groups:[
+    { level:"yellow", category:"Signs of pneumonia", items:["Consolidation","Air bronchogram","Silhouette sign","Cavitation"] },
+    { level:"green", category:"Signs of pneumothorax", items:["Visceral pleural line","Absent lung markings","Deep sulcus sign","Tracheal deviation"] },
+    { level:"blue", category:"Signs of pleural effusion", items:["Blunted costophrenic angle","Meniscus sign","Layering on lateral decubitus","Tracking"] },
+    { level:"purple", category:"Named radiographic signs", items:["Kerley B lines","Westermark sign","Hampton hump","Sail sign"] }
+  ]},
+  { title:"Pulmonary Embolism", groups:[
+    { level:"yellow", category:"Risk factors for VTE (Virchow's triad related)", items:["Immobility","Hypercoagulability","Endothelial injury","Malignancy"] },
+    { level:"green", category:"Symptoms of pulmonary embolism", items:["Pleuritic chest pain","Dyspnea","Tachycardia","Hemoptysis"] },
+    { level:"blue", category:"Diagnostic tests for PE", items:["CT pulmonary angiogram","V/Q scan","D-dimer","Doppler ultrasound"] },
+    { level:"purple", category:"Clinical decision scoring tools", items:["Wells score","PERC rule","Geneva score","CURB-65"] }
+  ]},
+  { title:"Asthma & COPD Management", groups:[
+    { level:"yellow", category:"Rescue/reliever medications", items:["Albuterol","Ipratropium","Levalbuterol","Racemic epinephrine"] },
+    { level:"green", category:"Controller medications", items:["Inhaled corticosteroid","Long-acting beta agonist","Leukotriene inhibitor","Long-acting muscarinic antagonist"] },
+    { level:"blue", category:"Signs of a severe exacerbation", items:["Accessory muscle use","Silent chest","Pulsus paradoxus","Inability to speak in full sentences"] },
+    { level:"purple", category:"GOLD/GINA classification terms", items:["Mild intermittent","Moderate persistent","Severe persistent","Exacerbation frequency"] }
+  ]},
+  { title:"Lung Anatomy & Physiology", groups:[
+    { level:"yellow", category:"Lobes of the lung", items:["Right upper lobe","Right middle lobe","Left upper lobe","Left lower lobe"] },
+    { level:"green", category:"Components of the respiratory tract", items:["Trachea","Bronchi","Bronchioles","Alveoli"] },
+    { level:"blue", category:"Lung volumes", items:["Tidal volume","Residual volume","Vital capacity","Functional residual capacity"] },
+    { level:"purple", category:"Gas exchange concepts", items:["V/Q mismatch","Diffusion","Dead space","Shunt"] }
+  ]},
+  { title:"Sleep Medicine", groups:[
+    { level:"yellow", category:"Symptoms of obstructive sleep apnea", items:["Snoring","Witnessed apneas","Daytime somnolence","Morning headache"] },
+    { level:"green", category:"Sleep study measurements", items:["Apnea-hypopnea index","Oxygen saturation nadir","Sleep latency","REM percentage"] },
+    { level:"blue", category:"Treatments for sleep apnea", items:["CPAP","Weight loss","Oral appliance","Uvulopalatopharyngoplasty"] },
+    { level:"purple", category:"Stages of sleep", items:["N1","N2","N3","REM"] }
+  ]},
+  { title:"Interstitial & Infiltrative Lung Disease", groups:[
+    { level:"yellow", category:"Causes of eosinophilic lung disease", items:["Churg-Strauss syndrome","Allergic bronchopulmonary aspergillosis","Loeffler syndrome","Drug reaction"] },
+    { level:"green", category:"Granulomatous lung diseases", items:["Sarcoidosis","Tuberculosis","Wegener's granulomatosis","Hypersensitivity pneumonitis"] },
+    { level:"blue", category:"Findings suggestive of sarcoidosis", items:["Bilateral hilar adenopathy","Elevated ACE level","Non-caseating granulomas","Erythema nodosum"] },
+    { level:"purple", category:"Idiopathic interstitial pneumonias", items:["Idiopathic pulmonary fibrosis","Nonspecific interstitial pneumonia","Cryptogenic organizing pneumonia","Desquamative interstitial pneumonia"] }
+  ]},
+  { title:"Liver Disease", groups:[
+    { level:"yellow", category:"Causes of cirrhosis", items:["Alcohol","Hepatitis C","Nonalcoholic fatty liver disease","Autoimmune hepatitis"] },
+    { level:"green", category:"Signs of chronic liver disease", items:["Spider angiomata","Palmar erythema","Caput medusae","Gynecomastia"] },
+    { level:"blue", category:"Complications of cirrhosis", items:["Ascites","Variceal bleeding","Hepatic encephalopathy","Hepatorenal syndrome"] },
+    { level:"purple", category:"Liver-related scoring systems", items:["Child-Pugh score","MELD score","FIB-4 index","APRI score"] }
+  ]},
+  { title:"Viral Hepatitis", groups:[
+    { level:"yellow", category:"Fecal-oral transmitted hepatitis", items:["Hepatitis A","Hepatitis E","Contaminated water","Shellfish"] },
+    { level:"green", category:"Bloodborne hepatitis", items:["Hepatitis B","Hepatitis C","Hepatitis D","Needle sharing"] },
+    { level:"blue", category:"Hepatitis B serology markers", items:["HBsAg","Anti-HBs","HBeAg","Anti-HBc"] },
+    { level:"purple", category:"Hepatitis with a vaccine available", items:["Hepatitis A vaccine","Hepatitis B vaccine","Hepatitis E (regional)","Combination vaccine"] }
+  ]},
+  { title:"Inflammatory Bowel Disease", groups:[
+    { level:"yellow", category:"Crohn disease features", items:["Skip lesions","Transmural inflammation","Cobblestoning","Fistulas"] },
+    { level:"green", category:"Ulcerative colitis features", items:["Continuous involvement","Mucosal inflammation only","Pseudopolyps","Toxic megacolon risk"] },
+    { level:"blue", category:"Extraintestinal manifestations of IBD", items:["Erythema nodosum","Pyoderma gangrenosum","Primary sclerosing cholangitis","Uveitis"] },
+    { level:"purple", category:"IBD treatment classes", items:["Aminosalicylates","Corticosteroids","Immunomodulators","Biologics"] }
+  ]},
+  { title:"Acute Abdomen", groups:[
+    { level:"yellow", category:"Causes of acute pancreatitis", items:["Gallstones","Alcohol","Hypertriglyceridemia","ERCP"] },
+    { level:"green", category:"Causes of small bowel obstruction", items:["Adhesions","Hernia","Volvulus","Intussusception"] },
+    { level:"blue", category:"Signs of appendicitis", items:["McBurney's point tenderness","Rovsing's sign","Psoas sign","Obturator sign"] },
+    { level:"purple", category:"Peritonitis exam findings", items:["Rebound tenderness","Guarding","Rigidity","Absent bowel sounds"] }
+  ]},
+  { title:"Esophageal & Gastric Disease", groups:[
+    { level:"yellow", category:"Causes of dysphagia", items:["Achalasia","Esophageal stricture","Esophageal cancer","Zenker diverticulum"] },
+    { level:"green", category:"Complications of GERD", items:["Esophageal ulceration","Esophagitis","Aspiration","Chronic cough"] },
+    { level:"blue", category:"Causes of upper GI bleeding", items:["Peptic ulcer disease","Esophageal varices","Mallory-Weiss tear","Gastritis"] },
+    { level:"purple", category:"Named esophageal conditions", items:["Barrett esophagus","Boerhaave syndrome","Plummer-Vinson syndrome","Schatzki ring"] }
+  ]},
+  { title:"Pancreatic & Biliary Disease", groups:[
+    { level:"yellow", category:"Functions of the pancreas", items:["Insulin secretion","Glucagon secretion","Digestive enzyme production","Bicarbonate secretion"] },
+    { level:"green", category:"Causes of biliary colic", items:["Gallstones","Biliary sludge","Cholesterol stones","Pigment stones"] },
+    { level:"blue", category:"Complications of gallstones", items:["Cholecystitis","Choledocholithiasis","Cholangitis","Gallstone pancreatitis"] },
+    { level:"purple", category:"Named biliary/pancreatic signs", items:["Murphy's sign","Courvoisier's sign","Cullen sign","Grey Turner sign"] }
+  ]},
+  { title:"Malabsorption & Nutrition", groups:[
+    { level:"yellow", category:"Causes of malabsorption", items:["Celiac disease","Chronic pancreatitis","Crohn disease","Short bowel syndrome"] },
+    { level:"green", category:"Fat-soluble vitamin deficiencies", items:["Vitamin A deficiency","Vitamin D deficiency","Vitamin E deficiency","Vitamin K deficiency"] },
+    { level:"blue", category:"Celiac disease markers", items:["Tissue transglutaminase antibody","Endomysial antibody","Villous atrophy","HLA-DQ2"] },
+    { level:"purple", category:"Water-soluble vitamin deficiency syndromes", items:["Beriberi","Pellagra","Scurvy","Wernicke encephalopathy"] }
+  ]},
+  { title:"Acid-Base Disorders", groups:[
+    { level:"yellow", category:"Causes of metabolic acidosis with elevated anion gap", items:["Diabetic ketoacidosis","Lactic acidosis","Uremia","Toxic alcohol ingestion"] },
+    { level:"green", category:"Causes of metabolic alkalosis", items:["Vomiting","Diuretic use","Hyperaldosteronism","Nasogastric suction"] },
+    { level:"blue", category:"Causes of respiratory acidosis", items:["COPD exacerbation","Opioid overdose","Neuromuscular weakness","Obesity hypoventilation"] },
+    { level:"purple", category:"Mnemonic causes of anion gap acidosis (MUDPILES)", items:["Methanol","Propylene glycol","Isoniazid","Ethylene glycol"] }
+  ]},
+  { title:"Acute Kidney Injury", groups:[
+    { level:"yellow", category:"Prerenal causes of AKI", items:["Hypovolemia","Heart failure","Sepsis","Renal artery stenosis"] },
+    { level:"green", category:"Intrinsic renal causes of AKI", items:["Acute tubular necrosis","Glomerulonephritis","Interstitial nephritis","Rhabdomyolysis"] },
+    { level:"blue", category:"Postrenal causes of AKI", items:["Bladder outlet obstruction","Ureteral stone","Neurogenic bladder","Prostatic hypertrophy"] },
+    { level:"purple", category:"Urinalysis findings", items:["Muddy brown casts","RBC casts","WBC casts","Hyaline casts"] }
+  ]},
+  { title:"Electrolyte Disorders", groups:[
+    { level:"yellow", category:"Causes of hyponatremia", items:["SIADH","Heart failure","Diuretic use","Adrenal insufficiency"] },
+    { level:"green", category:"Causes of hyperkalemia", items:["Kidney failure","ACE inhibitors","Rhabdomyolysis","Tumor lysis syndrome"] },
+    { level:"blue", category:"ECG changes with hyperkalemia", items:["Peaked T waves","Widened QRS","Loss of P waves","Sine wave pattern"] },
+    { level:"purple", category:"Causes of hypercalcemia (mnemonic-adjacent)", items:["Hyperparathyroidism","Malignancy","Vitamin D toxicity","Thiazide diuretics"] }
+  ]},
+  { title:"Glomerular Disease", groups:[
+    { level:"yellow", category:"Nephritic syndrome features", items:["Hematuria","Hypertension","RBC casts","Oliguria"] },
+    { level:"green", category:"Nephrotic syndrome features", items:["Proteinuria","Hypoalbuminemia","Edema","Hyperlipidemia"] },
+    { level:"blue", category:"Causes of rapidly progressive glomerulonephritis", items:["Goodpasture syndrome","Granulomatosis with polyangiitis","Lupus nephritis","IgA vasculitis"] },
+    { level:"purple", category:"Named nephropathies", items:["IgA nephropathy","Membranous nephropathy","Minimal change disease","Focal segmental glomerulosclerosis"] }
+  ]},
+  { title:"Dialysis & Renal Replacement", groups:[
+    { level:"yellow", category:"Indications for urgent dialysis (mnemonic-adjacent)", items:["Acidosis","Electrolyte imbalance","Ingestion/toxin","Overload of fluid"] },
+    { level:"green", category:"Types of renal replacement therapy", items:["Hemodialysis","Peritoneal dialysis","Continuous renal replacement therapy","Kidney transplant"] },
+    { level:"blue", category:"Vascular access for dialysis", items:["Arteriovenous fistula","Arteriovenous graft","Tunneled catheter","Temporary catheter"] },
+    { level:"purple", category:"Complications of chronic kidney disease", items:["Renal osteodystrophy","Secondary hyperparathyroidism","Anemia of chronic disease","Uremic pericarditis"] }
+  ]},
+  { title:"Kidney Stones", groups:[
+    { level:"yellow", category:"Types of kidney stones", items:["Calcium oxalate","Uric acid","Struvite","Cystine"] },
+    { level:"green", category:"Symptoms of nephrolithiasis", items:["Flank pain","Hematuria","Nausea","Pain radiating to groin"] },
+    { level:"blue", category:"Risk factors for stone formation", items:["Dehydration","Hypercalciuria","Gout","Recurrent UTIs"] },
+    { level:"purple", category:"Stone-related terms", items:["Struvite (infection-related)","Staghorn calculus","Nephrocalcinosis","Lithotripsy"] }
+  ]},
+  { title:"Diabetes Complications", groups:[
+    { level:"yellow", category:"Microvascular complications of diabetes", items:["Retinopathy","Nephropathy","Neuropathy","Gastroparesis"] },
+    { level:"green", category:"Macrovascular complications of diabetes", items:["Coronary artery disease","Peripheral artery disease","Stroke","Erectile dysfunction"] },
+    { level:"blue", category:"Diabetic ketoacidosis features", items:["Hyperglycemia","Ketosis","Anion gap acidosis","Kussmaul breathing"] },
+    { level:"purple", category:"Diabetes monitoring tests", items:["Hemoglobin A1c","Fasting glucose","Oral glucose tolerance test","C-peptide"] }
+  ]},
+  { title:"Thyroid Disease", groups:[
+    { level:"yellow", category:"Symptoms of hyperthyroidism", items:["Weight loss","Heat intolerance","Palpitations","Tremor"] },
+    { level:"green", category:"Symptoms of hypothyroidism", items:["Weight gain","Cold intolerance","Fatigue","Constipation"] },
+    { level:"blue", category:"Causes of hyperthyroidism", items:["Graves disease","Toxic multinodular goiter","Thyroiditis","Toxic adenoma"] },
+    { level:"purple", category:"Graves disease-specific findings", items:["Exophthalmos","Pretibial myxedema","Diffuse goiter","Thyroid bruit"] }
+  ]},
+  { title:"Adrenal Disorders", groups:[
+    { level:"yellow", category:"Features of Cushing syndrome", items:["Central obesity","Moon facies","Purple striae","Buffalo hump"] },
+    { level:"green", category:"Features of Addison disease", items:["Hyperpigmentation","Hypotension","Hyponatremia","Hyperkalemia"] },
+    { level:"blue", category:"Causes of Cushing syndrome", items:["Pituitary adenoma","Adrenal adenoma","Ectopic ACTH","Exogenous steroids"] },
+    { level:"purple", category:"Adrenal hormone zones (zona ___)", items:["Glomerulosa","Fasciculata","Reticularis","Medulla"] }
+  ]},
+  { title:"Pituitary & Growth Disorders", groups:[
+    { level:"yellow", category:"Anterior pituitary hormones", items:["ACTH","TSH","FSH","LH"] },
+    { level:"green", category:"Hypothalamic releasing hormones", items:["CRH","TRH","GnRH","GHRH"] },
+    { level:"blue", category:"Features of acromegaly", items:["Enlarged hands","Coarse facial features","Jaw enlargement","Excessive sweating"] },
+    { level:"purple", category:"Pituitary axis feedback terms", items:["Negative feedback","Hypothalamic-pituitary axis","Releasing hormone","Trophic hormone"] }
+  ]},
+  { title:"Calcium & Bone Metabolism", groups:[
+    { level:"yellow", category:"Hormones regulating calcium", items:["Parathyroid hormone","Calcitonin","Vitamin D","Calcitriol"] },
+    { level:"green", category:"Signs of hypocalcemia", items:["Chvostek sign","Trousseau sign","Perioral numbness","Tetany"] },
+    { level:"blue", category:"Causes of osteoporosis", items:["Estrogen deficiency","Corticosteroid use","Immobilization","Vitamin D deficiency"] },
+    { level:"purple", category:"Metabolic bone diseases", items:["Osteoporosis","Osteomalacia","Paget disease","Renal osteodystrophy"] }
+  ]},
+  { title:"Lipid & Metabolic Syndrome", groups:[
+    { level:"yellow", category:"Components of metabolic syndrome", items:["Abdominal obesity","Hypertension","Elevated triglycerides","Insulin resistance"] },
+    { level:"green", category:"Lipid panel components", items:["LDL cholesterol","HDL cholesterol","Triglycerides","Total cholesterol"] },
+    { level:"blue", category:"Lipid-lowering drug classes", items:["Statins","Fibrates","Bile acid sequestrants","PCSK9 inhibitors"] },
+    { level:"purple", category:"Genetic dyslipidemias", items:["Familial hypercholesterolemia","Familial combined hyperlipidemia","Familial hypertriglyceridemia","Dysbetalipoproteinemia"] }
+  ]},
+  { title:"Anemia Workup", groups:[
+    { level:"yellow", category:"Microcytic anemia causes", items:["Iron deficiency","Thalassemia","Sideroblastic anemia","Lead poisoning"] },
+    { level:"green", category:"Macrocytic anemia causes", items:["Vitamin B12 deficiency","Folate deficiency","Alcohol use","Hypothyroidism"] },
+    { level:"blue", category:"Hemolytic anemia findings", items:["Elevated LDH","Low haptoglobin","Reticulocytosis","Indirect hyperbilirubinemia"] },
+    { level:"purple", category:"Inherited hemolytic anemias", items:["Sickle cell disease","Hereditary spherocytosis","G6PD deficiency","Pyruvate kinase deficiency"] }
+  ]},
+  { title:"Coagulation Disorders", groups:[
+    { level:"yellow", category:"Inherited bleeding disorders", items:["Hemophilia A","Hemophilia B","Von Willebrand disease","Factor XI deficiency"] },
+    { level:"green", category:"Causes of thrombocytopenia", items:["Immune thrombocytopenia","Heparin-induced thrombocytopenia","DIC","Bone marrow failure"] },
+    { level:"blue", category:"Coagulation cascade tests", items:["PT","aPTT","INR","Fibrinogen level"] },
+    { level:"purple", category:"Thrombotic microangiopathies", items:["Thrombotic thrombocytopenic purpura","Hemolytic uremic syndrome","Malignant hypertension","Atypical HUS"] }
+  ]},
+  { title:"Leukemias & Lymphomas", groups:[
+    { level:"yellow", category:"Acute leukemias", items:["Acute lymphoblastic leukemia","Acute myeloid leukemia","Acute promyelocytic leukemia","Mixed phenotype leukemia"] },
+    { level:"green", category:"Chronic leukemias", items:["Chronic lymphocytic leukemia","Chronic myeloid leukemia","Hairy cell leukemia","Large granular lymphocytic leukemia"] },
+    { level:"blue", category:"Hodgkin lymphoma features", items:["Reed-Sternberg cells","Painless lymphadenopathy","B symptoms","Contiguous spread"] },
+    { level:"purple", category:"Genetic markers of leukemia", items:["Philadelphia chromosome","PML-RARA fusion","FLT3 mutation","JAK2 mutation"] }
+  ]},
+  { title:"Chemotherapy & Cancer Treatment", groups:[
+    { level:"yellow", category:"Chemotherapy drug classes", items:["Alkylating agents","Antimetabolites","Topoisomerase inhibitors","Antimicrotubule agents"] },
+    { level:"green", category:"Common chemotherapy toxicities", items:["Myelosuppression","Nausea and vomiting","Alopecia","Mucositis"] },
+    { level:"blue", category:"Cancer treatment modalities", items:["Surgery","Radiation therapy","Chemotherapy","Immunotherapy"] },
+    { level:"purple", category:"Organ-specific chemotherapy toxicities", items:["Cardiotoxicity","Nephrotoxicity","Pulmonary fibrosis","Peripheral neuropathy"] }
+  ]},
+  { title:"Tumor Markers & Staging", groups:[
+    { level:"yellow", category:"Common tumor markers", items:["CEA","CA-125","PSA","AFP"] },
+    { level:"green", category:"Cancers associated with specific markers", items:["Colorectal cancer","Ovarian cancer","Prostate cancer","Hepatocellular carcinoma"] },
+    { level:"blue", category:"TNM staging components", items:["Tumor size","Node involvement","Metastasis","Grade"] },
+    { level:"purple", category:"Paraneoplastic syndromes", items:["SIADH","Cushing syndrome","Hypercalcemia of malignancy","Lambert-Eaton syndrome"] }
+  ]},
+  { title:"Transfusion Medicine", groups:[
+    { level:"yellow", category:"Blood product types", items:["Packed red blood cells","Fresh frozen plasma","Platelets","Cryoprecipitate"] },
+    { level:"green", category:"Transfusion reaction types", items:["Febrile nonhemolytic reaction","Acute hemolytic reaction","Allergic reaction","TRALI"] },
+    { level:"blue", category:"Blood typing components", items:["ABO type","Rh factor","Antibody screen","Crossmatch"] },
+    { level:"purple", category:"Universal donor and recipient concepts", items:["O negative","AB positive","Rh compatibility","Type and screen"] }
+  ]},
+  { title:"Multiple Myeloma & Plasma Cell Disorders", groups:[
+    { level:"yellow", category:"Multiple myeloma features (CRAB)", items:["Calcium elevation","Renal insufficiency","Anemia","Bone lesions"] },
+    { level:"green", category:"Multiple myeloma diagnostic findings", items:["M spike","Bence Jones protein","Rouleaux formation","Plasma cells on biopsy"] },
+    { level:"blue", category:"Plasma cell disorders", items:["Multiple myeloma","MGUS","Waldenstrom macroglobulinemia","Amyloidosis"] },
+    { level:"purple", category:"Multiple myeloma treatment classes", items:["Proteasome inhibitors","Immunomodulatory drugs","Corticosteroids","Monoclonal antibodies"] }
+  ]},
+  { title:"Gram Stain & Bacteriology", groups:[
+    { level:"yellow", category:"Gram-positive cocci", items:["Staphylococcus aureus","Streptococcus pneumoniae","Streptococcus pyogenes","Enterococcus"] },
+    { level:"green", category:"Gram-negative rods", items:["Escherichia coli","Klebsiella pneumoniae","Pseudomonas aeruginosa","Proteus mirabilis"] },
+    { level:"blue", category:"Atypical bacteria", items:["Mycoplasma pneumoniae","Chlamydia pneumoniae","Legionella pneumophila","Coxiella burnetii"] },
+    { level:"purple", category:"Spirochetes", items:["Treponema pallidum","Borrelia burgdorferi","Leptospira","Borrelia recurrentis"] }
+  ]},
+  { title:"Central Nervous System Infections", groups:[
+    { level:"yellow", category:"Bacterial meningitis pathogens by age group", items:["Group B Streptococcus","Neisseria meningitidis","Streptococcus pneumoniae","Listeria monocytogenes"] },
+    { level:"green", category:"Signs of meningitis", items:["Nuchal rigidity","Kernig sign","Brudzinski sign","Photophobia"] },
+    { level:"blue", category:"CSF findings in bacterial meningitis", items:["Elevated protein","Low glucose","Neutrophilic pleocytosis","Elevated opening pressure"] },
+    { level:"purple", category:"Causes of viral encephalitis", items:["Herpes simplex virus","West Nile virus","Eastern equine encephalitis","Rabies virus"] }
+  ]},
+  { title:"Fungal Infections", groups:[
+    { level:"yellow", category:"Dimorphic fungi", items:["Histoplasma capsulatum","Blastomyces dermatitidis","Coccidioides immitis","Sporothrix schenckii"] },
+    { level:"green", category:"Opportunistic fungal infections", items:["Candidiasis","Aspergillosis","Cryptococcosis","Pneumocystis pneumonia"] },
+    { level:"blue", category:"Antifungal drug classes", items:["Azoles","Polyenes","Echinocandins","Allylamines"] },
+    { level:"purple", category:"Geographic-associated fungal infections", items:["Histoplasmosis (Ohio River Valley)","Coccidioidomycosis (Southwest US)","Blastomycosis (Great Lakes)","Paracoccidioidomycosis (South America)"] }
+  ]},
+  { title:"Sepsis & Infection Severity", groups:[
+    { level:"yellow", category:"SIRS criteria", items:["Fever or hypothermia","Tachycardia","Tachypnea","Abnormal white count"] },
+    { level:"green", category:"Sepsis management bundle elements", items:["Blood cultures","Broad-spectrum antibiotics","IV fluids","Lactate measurement"] },
+    { level:"blue", category:"Signs of septic shock", items:["Hypotension","Elevated lactate","Altered mental status","Decreased urine output"] },
+    { level:"purple", category:"Severity scoring systems", items:["qSOFA","SOFA score","APACHE II","MEWS"] }
+  ]},
+  { title:"Vaccines & Immunization", groups:[
+    { level:"yellow", category:"Live attenuated vaccines", items:["MMR","Varicella","Yellow fever","Oral polio vaccine"] },
+    { level:"green", category:"Inactivated or subunit vaccines", items:["Inactivated polio vaccine","Hepatitis B","Influenza (injectable)","Pertussis"] },
+    { level:"blue", category:"Vaccine schedule timing", items:["Birth (Hepatitis B)","2 months (start of primary series)","12-15 months (MMR/Varicella)","4-6 years (school entry boosters)"] },
+    { level:"purple", category:"Vaccine technology types", items:["mRNA","Viral vector","Protein subunit","Inactivated whole virus"] }
+  ]},
+  { title:"HIV & Opportunistic Infections", groups:[
+    { level:"yellow", category:"Antiretroviral drug classes", items:["Nucleoside reverse transcriptase inhibitors","Protease inhibitors","Integrase inhibitors","Non-nucleoside reverse transcriptase inhibitors"] },
+    { level:"green", category:"AIDS-defining opportunistic infections", items:["Pneumocystis pneumonia","Toxoplasmosis","Cryptococcal meningitis","CMV retinitis"] },
+    { level:"blue", category:"CD4 count thresholds for prophylaxis", items:["Below 200 (PCP)","Below 100 (Toxoplasma)","Below 50 (MAC)","Below 200 (Candida esophagitis risk)"] },
+    { level:"purple", category:"HIV diagnostic tests", items:["ELISA screening","Western blot","HIV RNA viral load","p24 antigen"] }
+  ]},
+  { title:"Parasitology", groups:[
+    { level:"yellow", category:"Protozoan parasites", items:["Plasmodium falciparum","Giardia lamblia","Entamoeba histolytica","Toxoplasma gondii"] },
+    { level:"green", category:"Helminth (worm) infections", items:["Ascaris lumbricoides","Enterobius vermicularis","Necator americanus","Taenia solium"] },
+    { level:"blue", category:"Vector-borne parasitic diseases", items:["Malaria","Babesiosis","Leishmaniasis","Chagas disease"] },
+    { level:"purple", category:"Antiparasitic medications", items:["Metronidazole","Albendazole","Ivermectin","Praziquantel"] }
+  ]},
+  { title:"Tuberculosis", groups:[
+    { level:"yellow", category:"Symptoms of active tuberculosis", items:["Chronic cough","Night sweats","Weight loss","Hemoptysis"] },
+    { level:"green", category:"First-line TB medications", items:["Isoniazid","Rifampin","Ethambutol","Pyrazinamide"] },
+    { level:"blue", category:"TB diagnostic tests", items:["Tuberculin skin test","Interferon-gamma release assay","Sputum acid-fast stain","Chest X-ray"] },
+    { level:"purple", category:"Isoniazid-associated adverse effects", items:["Peripheral neuropathy","Hepatotoxicity","Drug-induced lupus","Vitamin B6 depletion"] }
+  ]},
+  { title:"Stroke", groups:[
+    { level:"yellow", category:"Stroke risk factors", items:["Hypertension","Atrial fibrillation","Diabetes","Smoking"] },
+    { level:"green", category:"Signs of anterior circulation stroke", items:["Aphasia","Hemiparesis","Hemineglect","Gaze deviation"] },
+    { level:"blue", category:"Signs of posterior circulation stroke", items:["Vertigo","Diplopia","Ataxia","Dysarthria"] },
+    { level:"purple", category:"Acute stroke treatment options", items:["tPA","Mechanical thrombectomy","Antiplatelet therapy","Blood pressure management"] }
+  ]},
+  { title:"Seizures & Epilepsy", groups:[
+    { level:"yellow", category:"Focal seizure features", items:["Preserved awareness possible","Automatisms","Todd paralysis","Aura"] },
+    { level:"green", category:"Generalized seizure types", items:["Tonic-clonic","Absence","Myoclonic","Atonic"] },
+    { level:"blue", category:"Antiepileptic drugs", items:["Levetiracetam","Valproate","Lamotrigine","Phenytoin"] },
+    { level:"purple", category:"Status epilepticus management steps", items:["Benzodiazepine first line","Second-line antiepileptic","Airway management","Identify underlying cause"] }
+  ]},
+  { title:"Movement Disorders", groups:[
+    { level:"yellow", category:"Parkinson disease cardinal features", items:["Resting tremor","Bradykinesia","Rigidity","Postural instability"] },
+    { level:"green", category:"Parkinson disease treatments", items:["Levodopa-carbidopa","Dopamine agonists","MAO-B inhibitors","Deep brain stimulation"] },
+    { level:"blue", category:"Hyperkinetic movement disorders", items:["Chorea","Dystonia","Myoclonus","Tics"] },
+    { level:"purple", category:"Parkinson-plus syndromes", items:["Progressive supranuclear palsy","Multiple system atrophy","Corticobasal degeneration","Lewy body dementia"] }
+  ]},
+  { title:"Peripheral Neuropathy", groups:[
+    { level:"yellow", category:"Causes of peripheral neuropathy", items:["Diabetes","Alcohol use","Vitamin B12 deficiency","Chemotherapy"] },
+    { level:"green", category:"Guillain-Barre syndrome features", items:["Ascending weakness","Areflexia","Albuminocytologic dissociation","Autonomic instability"] },
+    { level:"blue", category:"Types of nerve conduction abnormality", items:["Demyelinating pattern","Axonal pattern","Conduction block","Slowed velocity"] },
+    { level:"purple", category:"Named neuropathy patterns", items:["Glove and stocking distribution","Mononeuritis multiplex","Radiculopathy","Polyradiculoneuropathy"] }
+  ]},
+  { title:"Headache Disorders", groups:[
+    { level:"yellow", category:"Primary headache disorders", items:["Migraine","Tension headache","Cluster headache","Trigeminal neuralgia"] },
+    { level:"green", category:"Migraine with aura symptoms", items:["Visual scintillations","Sensory disturbance","Speech difficulty","Scotoma"] },
+    { level:"blue", category:"Red flag headache features", items:["Thunderclap onset","Fever with headache","Papilledema","New headache after 50"] },
+    { level:"purple", category:"Abortive migraine treatments", items:["Triptans","NSAIDs","Ergotamines","CGRP antagonists"] }
+  ]},
+  { title:"Dementia", groups:[
+    { level:"yellow", category:"Types of dementia", items:["Alzheimer disease","Vascular dementia","Lewy body dementia","Frontotemporal dementia"] },
+    { level:"green", category:"Alzheimer disease pathology", items:["Amyloid plaques","Neurofibrillary tangles","Hippocampal atrophy","Cholinergic deficit"] },
+    { level:"blue", category:"Reversible causes of cognitive decline", items:["Hypothyroidism","Vitamin B12 deficiency","Normal pressure hydrocephalus","Depression"] },
+    { level:"purple", category:"Cognitive screening tools", items:["Mini-Mental State Examination","Montreal Cognitive Assessment","Clock drawing test","Mini-Cog"] }
+  ]},
+  { title:"Cranial Nerve Exam", groups:[
+    { level:"yellow", category:"Cranial nerves I through IV", items:["Olfactory nerve","Optic nerve","Oculomotor nerve","Trochlear nerve"] },
+    { level:"green", category:"Cranial nerves V through VIII", items:["Trigeminal nerve","Abducens nerve","Facial nerve","Vestibulocochlear nerve"] },
+    { level:"blue", category:"Cranial nerves IX through XII", items:["Glossopharyngeal nerve","Vagus nerve","Accessory nerve","Hypoglossal nerve"] },
+    { level:"purple", category:"Named cranial nerve reflexes", items:["Pupillary light reflex","Corneal reflex","Gag reflex","Jaw jerk reflex"] }
+  ]},
+  { title:"Mood & Anxiety Disorders", groups:[
+    { level:"yellow", category:"Symptoms of major depressive disorder", items:["Anhedonia","Sleep disturbance","Poor concentration","Feelings of worthlessness"] },
+    { level:"green", category:"Symptoms of mania", items:["Decreased need for sleep","Grandiosity","Racing thoughts","Increased goal-directed activity"] },
+    { level:"blue", category:"Anxiety disorders", items:["Generalized anxiety disorder","Panic disorder","Social anxiety disorder","Specific phobia"] },
+    { level:"purple", category:"Antidepressant drug classes", items:["SSRIs","SNRIs","Tricyclic antidepressants","MAO inhibitors"] }
+  ]},
+  { title:"Psychotic Disorders", groups:[
+    { level:"yellow", category:"Positive symptoms of schizophrenia", items:["Hallucinations","Delusions","Disorganized speech","Disorganized behavior"] },
+    { level:"green", category:"Negative symptoms of schizophrenia", items:["Flat affect","Avolition","Alogia","Social withdrawal"] },
+    { level:"blue", category:"Antipsychotic side effects", items:["Extrapyramidal symptoms","Tardive dyskinesia","Weight gain","Hyperprolactinemia"] },
+    { level:"purple", category:"Schizophrenia-spectrum disorders", items:["Schizophrenia","Schizoaffective disorder","Schizophreniform disorder","Brief psychotic disorder"] }
+  ]},
+  { title:"Personality Disorders", groups:[
+    { level:"yellow", category:"Cluster B personality disorders", items:["Borderline","Narcissistic","Histrionic","Antisocial"] },
+    { level:"green", category:"Borderline personality disorder features", items:["Fear of abandonment","Unstable relationships","Impulsivity","Chronic emptiness"] },
+    { level:"blue", category:"Defense mechanisms", items:["Splitting","Projection","Reaction formation","Sublimation"] },
+    { level:"purple", category:"Psychotherapy concepts", items:["Dialectical behavior therapy","Transference","Countertransference","Object relations"] }
+  ]},
+  { title:"Substance Use Disorders", groups:[
+    { level:"yellow", category:"Alcohol withdrawal symptoms", items:["Tremor","Anxiety","Autonomic hyperactivity","Seizure risk"] },
+    { level:"green", category:"Opioid withdrawal symptoms", items:["Piloerection","Rhinorrhea","Diarrhea","Muscle aches"] },
+    { level:"blue", category:"Medications for alcohol use disorder", items:["Naltrexone","Acamprosate","Disulfiram","Topiramate"] },
+    { level:"purple", category:"Withdrawal syndromes that can be life-threatening", items:["Alcohol withdrawal","Benzodiazepine withdrawal","Barbiturate withdrawal","Delirium tremens"] }
+  ]},
+  { title:"Child & Developmental Psychiatry", groups:[
+    { level:"yellow", category:"ADHD symptoms", items:["Inattention","Hyperactivity","Impulsivity","Difficulty organizing tasks"] },
+    { level:"green", category:"Autism spectrum disorder features", items:["Social communication deficits","Restricted interests","Repetitive behaviors","Sensory sensitivities"] },
+    { level:"blue", category:"Medications for ADHD", items:["Methylphenidate","Amphetamine salts","Atomoxetine","Guanfacine"] },
+    { level:"purple", category:"Disruptive behavior disorders", items:["Oppositional defiant disorder","Conduct disorder","Intermittent explosive disorder","Disruptive mood dysregulation disorder"] }
+  ]},
+  { title:"Eating Disorders", groups:[
+    { level:"yellow", category:"Anorexia nervosa features", items:["Restriction of intake","Fear of weight gain","Distorted body image","Low body weight"] },
+    { level:"green", category:"Bulimia nervosa features", items:["Binge eating","Compensatory behaviors","Normal or elevated body weight","Self-esteem tied to body shape"] },
+    { level:"blue", category:"Medical complications of eating disorders", items:["Electrolyte abnormalities","Bradycardia","Osteoporosis","Amenorrhea"] },
+    { level:"purple", category:"Refeeding syndrome electrolyte changes", items:["Hypophosphatemia","Hypokalemia","Hypomagnesemia","Fluid retention"] }
+  ]},
+  { title:"Inflammatory Arthritis", groups:[
+    { level:"yellow", category:"Rheumatoid arthritis features", items:["Symmetric joint involvement","Morning stiffness","Ulnar deviation","Rheumatoid nodules"] },
+    { level:"green", category:"Seronegative spondyloarthropathies", items:["Ankylosing spondylitis","Psoriatic arthritis","Reactive arthritis","Enteropathic arthritis"] },
+    { level:"blue", category:"Rheumatoid arthritis lab markers", items:["Rheumatoid factor","Anti-CCP antibody","ESR","CRP"] },
+    { level:"purple", category:"Extra-articular manifestations of rheumatoid arthritis", items:["Felty syndrome","Sjogren syndrome","Interstitial lung disease","Rheumatoid vasculitis"] }
+  ]},
+  { title:"Crystal Arthropathies & Gout", groups:[
+    { level:"yellow", category:"Gout features", items:["Podagra","Tophi","Negatively birefringent crystals","Hyperuricemia"] },
+    { level:"green", category:"Pseudogout features", items:["Positively birefringent crystals","Calcium pyrophosphate deposition","Chondrocalcinosis","Knee involvement common"] },
+    { level:"blue", category:"Gout treatment medications", items:["Colchicine","Allopurinol","Febuxostat","NSAIDs"] },
+    { level:"purple", category:"Risk factors for gout", items:["Alcohol use","Diuretic use","Purine-rich diet","Obesity"] }
+  ]},
+  { title:"Connective Tissue Diseases", groups:[
+    { level:"yellow", category:"Systemic lupus erythematosus features", items:["Malar rash","Photosensitivity","Oral ulcers","Discoid rash"] },
+    { level:"green", category:"Lupus-associated antibodies", items:["Anti-dsDNA","Anti-Smith","Antinuclear antibody","Antiphospholipid antibody"] },
+    { level:"blue", category:"Systemic sclerosis features (CREST)", items:["Calcinosis","Raynaud phenomenon","Esophageal dysmotility","Sclerodactyly"] },
+    { level:"purple", category:"Inflammatory myopathies", items:["Dermatomyositis","Polymyositis","Inclusion body myositis","Antisynthetase syndrome"] }
+  ]},
+  { title:"Vasculitis", groups:[
+    { level:"yellow", category:"Named vasculitides", items:["Giant cell arteritis","Takayasu arteritis","Polyarteritis nodosa","Kawasaki disease"] },
+    { level:"green", category:"IgA vasculitis (Henoch-Schonlein purpura) features", items:["Palpable purpura","Arthralgia","Abdominal pain","IgA deposition"] },
+    { level:"blue", category:"ANCA-associated vasculitis findings", items:["p-ANCA positivity","c-ANCA positivity","Pauci-immune glomerulonephritis","Pulmonary hemorrhage"] },
+    { level:"purple", category:"Vasculitis treatment medications", items:["Corticosteroids","Cyclophosphamide","Rituximab","Azathioprine"] }
+  ]},
+  { title:"Orthopedic Exam & Injuries", groups:[
+    { level:"yellow", category:"Rotator cuff muscles", items:["Supraspinatus","Infraspinatus","Teres minor","Subscapularis"] },
+    { level:"green", category:"Knee ligaments", items:["Anterior cruciate ligament","Posterior cruciate ligament","Medial collateral ligament","Lateral collateral ligament"] },
+    { level:"blue", category:"Special orthopedic tests", items:["Lachman test","McMurray test","Drawer test","Apprehension test"] },
+    { level:"purple", category:"Compartment syndrome findings (the P's)", items:["Pain out of proportion","Pallor","Paresthesia","Pulselessness"] }
+  ]},
+  { title:"Metabolic Bone & Muscle Disease", groups:[
+    { level:"yellow", category:"Causes of osteomalacia", items:["Vitamin D deficiency","Malabsorption","Chronic kidney disease","Certain anticonvulsants"] },
+    { level:"green", category:"Fibromyalgia features", items:["Widespread pain","Fatigue","Sleep disturbance","Tender points"] },
+    { level:"blue", category:"Muscular dystrophy types", items:["Duchenne","Becker","Myotonic","Limb-girdle"] },
+    { level:"purple", category:"Paget disease of bone features", items:["Elevated alkaline phosphatase","Bone pain","Skull enlargement","Increased fracture risk"] }
+  ]},
+  { title:"Pediatric Orthopedics", groups:[
+    { level:"yellow", category:"Causes of limping child by age group", items:["Developmental dysplasia of the hip","Transient synovitis","Legg-Calve-Perthes disease","Slipped capital femoral epiphysis"] },
+    { level:"green", category:"Signs of developmental dysplasia of the hip", items:["Positive Ortolani sign","Positive Barlow sign","Asymmetric skin folds","Leg length discrepancy"] },
+    { level:"blue", category:"Common pediatric fractures", items:["Greenstick fracture","Buckle fracture","Salter-Harris fracture","Supracondylar fracture"] },
+    { level:"purple", category:"Salter-Harris fracture classification", items:["Type I (through the plate)","Type II (plate and metaphysis)","Type III (plate and epiphysis)","Type IV (through all three)"] }
+  ]},
+  { title:"Skin Cancer & Lesions", groups:[
+    { level:"yellow", category:"ABCDE signs of melanoma", items:["Asymmetry","Border irregularity","Color variation","Diameter greater than 6mm"] },
+    { level:"green", category:"Benign skin lesions", items:["Seborrheic keratosis","Dermatofibroma","Skin tag","Cherry angioma"] },
+    { level:"blue", category:"Precancerous skin lesions", items:["Actinic keratosis","Dysplastic nevus","Bowen disease","Leukoplakia"] },
+    { level:"purple", category:"Melanoma subtypes", items:["Superficial spreading","Nodular","Lentigo maligna","Acral lentiginous"] }
+  ]},
+  { title:"Infectious Skin Conditions", groups:[
+    { level:"yellow", category:"Bacterial skin infections", items:["Cellulitis","Impetigo","Erysipelas","Folliculitis"] },
+    { level:"green", category:"Fungal skin infections", items:["Tinea corporis","Tinea pedis","Tinea versicolor","Candidal intertrigo"] },
+    { level:"blue", category:"Viral skin infections", items:["Herpes simplex","Molluscum contagiosum","Varicella","Verruca vulgaris"] },
+    { level:"purple", category:"Skin infestations", items:["Scabies","Pediculosis","Cutaneous larva migrans","Bed bug bites"] }
+  ]},
+  { title:"Blistering & Immune Skin Disease", groups:[
+    { level:"yellow", category:"Autoimmune blistering diseases", items:["Pemphigus vulgaris","Bullous pemphigoid","Dermatitis herpetiformis","Epidermolysis bullosa acquisita"] },
+    { level:"green", category:"Severe cutaneous drug reactions", items:["Stevens-Johnson syndrome","Toxic epidermal necrolysis","DRESS syndrome","Erythema multiforme"] },
+    { level:"blue", category:"Eczematous conditions", items:["Atopic dermatitis","Contact dermatitis","Seborrheic dermatitis","Nummular eczema"] },
+    { level:"purple", category:"Papulosquamous disorders", items:["Psoriasis","Lichen planus","Pityriasis rosea","Seborrheic dermatitis pattern"] }
+  ]},
+  { title:"Skin Exam Terminology", groups:[
+    { level:"yellow", category:"Flat skin lesions", items:["Macule","Patch","Freckle","Port-wine stain"] },
+    { level:"green", category:"Raised solid skin lesions", items:["Papule","Plaque","Nodule","Wheal"] },
+    { level:"blue", category:"Fluid-filled skin lesions", items:["Vesicle","Bulla","Pustule","Cyst"] },
+    { level:"purple", category:"Secondary skin changes", items:["Scale","Crust","Excoriation","Lichenification"] }
+  ]},
+  { title:"Pigmentation Disorders", groups:[
+    { level:"yellow", category:"Causes of hyperpigmentation", items:["Melasma","Post-inflammatory hyperpigmentation","Addison disease","Hemochromatosis"] },
+    { level:"green", category:"Causes of hypopigmentation", items:["Vitiligo","Tinea versicolor","Albinism","Pityriasis alba"] },
+    { level:"blue", category:"Vitiligo-associated autoimmune conditions", items:["Hashimoto thyroiditis","Type 1 diabetes","Pernicious anemia","Celiac disease"] },
+    { level:"purple", category:"Genetic pigmentation conditions", items:["Piebaldism","Neurofibromatosis (cafe-au-lait)","Tuberous sclerosis (ash leaf)","Waardenburg syndrome"] }
+  ]},
+  { title:"Pregnancy Complications", groups:[
+    { level:"yellow", category:"Hypertensive disorders of pregnancy", items:["Gestational hypertension","Preeclampsia","Eclampsia","Chronic hypertension"] },
+    { level:"green", category:"Preeclampsia features", items:["Hypertension","Proteinuria","Headache","Visual disturbances"] },
+    { level:"blue", category:"Causes of third trimester bleeding", items:["Placenta previa","Placental abruption","Vasa previa","Uterine rupture"] },
+    { level:"purple", category:"HELLP syndrome components", items:["Hemolysis","Elevated liver enzymes","Low platelets","Right upper quadrant pain"] }
+  ]},
+  { title:"Gynecologic Conditions", groups:[
+    { level:"yellow", category:"Causes of abnormal uterine bleeding (PALM)", items:["Polyps","Adenomyosis","Leiomyoma","Malignancy"] },
+    { level:"green", category:"Endometriosis features", items:["Dysmenorrhea","Dyspareunia","Infertility","Chronic pelvic pain"] },
+    { level:"blue", category:"Polycystic ovary syndrome features", items:["Oligomenorrhea","Hirsutism","Insulin resistance","Polycystic ovaries on ultrasound"] },
+    { level:"purple", category:"Gynecologic cancer types", items:["Endometrial cancer","Ovarian cancer","Cervical cancer","Vulvar cancer"] }
+  ]},
+  { title:"Contraception", groups:[
+    { level:"yellow", category:"Hormonal contraceptive methods", items:["Combined oral contraceptives","Progestin-only pill","Contraceptive patch","Vaginal ring"] },
+    { level:"green", category:"Long-acting reversible contraception", items:["Copper IUD","Hormonal IUD","Subdermal implant","Depo injection"] },
+    { level:"blue", category:"Barrier contraceptive methods", items:["Male condom","Female condom","Diaphragm","Cervical cap"] },
+    { level:"purple", category:"Contraindications to estrogen-containing contraceptives", items:["History of blood clots","Migraine with aura","Smoking over age 35","Uncontrolled hypertension"] }
+  ]},
+  { title:"Neonatal Medicine", groups:[
+    { level:"yellow", category:"APGAR score components", items:["Appearance","Pulse","Grimace","Respiration"] },
+    { level:"green", category:"Causes of neonatal jaundice", items:["Physiologic jaundice","ABO incompatibility","Breast milk jaundice","Biliary atresia"] },
+    { level:"blue", category:"Signs of respiratory distress in a newborn", items:["Grunting","Nasal flaring","Retractions","Tachypnea"] },
+    { level:"purple", category:"TORCH infection pathogens", items:["Toxoplasmosis","Rubella","Cytomegalovirus","Herpes simplex virus"] }
+  ]},
+  { title:"Pediatric Growth & Development", groups:[
+    { level:"yellow", category:"Gross motor milestones", items:["Rolling over","Sitting unsupported","Crawling","Walking"] },
+    { level:"green", category:"Fine motor and language milestones", items:["Pincer grasp","Babbling","First words","Two-word phrases"] },
+    { level:"blue", category:"Newborn primitive reflexes", items:["Moro reflex","Rooting reflex","Palmar grasp reflex","Babinski reflex"] },
+    { level:"purple", category:"Tanner stage assessment areas", items:["Breast development","Pubic hair","Genital development","Testicular volume"] }
+  ]},
+  { title:"Pediatric Infectious Disease", groups:[
+    { level:"yellow", category:"Common childhood exanthems", items:["Measles","Roseola","Fifth disease","Chickenpox"] },
+    { level:"green", category:"Croup and upper airway infections", items:["Croup","Epiglottitis","Bacterial tracheitis","Peritonsillar abscess"] },
+    { level:"blue", category:"Kawasaki disease diagnostic criteria", items:["Fever five days or more","Conjunctivitis","Strawberry tongue","Extremity changes"] },
+    { level:"purple", category:"Vaccine-preventable childhood illnesses", items:["Diphtheria","Pertussis","Rotavirus","Haemophilus influenzae type b"] }
+  ]},
+  { title:"Labor & Delivery", groups:[
+    { level:"yellow", category:"Stages of labor", items:["First stage","Second stage","Third stage","Fourth stage"] },
+    { level:"green", category:"Fetal heart rate monitoring terms", items:["Baseline rate","Variability","Accelerations","Decelerations"] },
+    { level:"blue", category:"Indications for cesarean delivery", items:["Fetal distress","Failure to progress","Placenta previa","Breech presentation"] },
+    { level:"purple", category:"Fetal presentation types", items:["Cephalic","Breech","Transverse","Oblique"] }
+  ]},
+  { title:"Pharmacokinetics", groups:[
+    { level:"yellow", category:"Pharmacokinetic processes (ADME)", items:["Absorption","Distribution","Metabolism","Excretion"] },
+    { level:"green", category:"Phase I metabolism reactions", items:["Oxidation","Reduction","Hydrolysis","Cytochrome P450 activity"] },
+    { level:"blue", category:"Routes of drug administration", items:["Oral","Intravenous","Intramuscular","Subcutaneous"] },
+    { level:"purple", category:"Pharmacokinetic parameters", items:["Half-life","Bioavailability","Volume of distribution","Clearance"] }
+  ]},
+  { title:"Drug Interactions & Toxicology", groups:[
+    { level:"yellow", category:"CYP450 enzyme inducers", items:["Rifampin","Phenytoin","Carbamazepine","St. John's wort"] },
+    { level:"green", category:"CYP450 enzyme inhibitors", items:["Ketoconazole","Erythromycin","Cimetidine","Grapefruit juice"] },
+    { level:"blue", category:"Common drug antidotes", items:["Naloxone","Flumazenil","N-acetylcysteine","Physostigmine"] },
+    { level:"purple", category:"Drugs requiring therapeutic monitoring", items:["Digoxin","Lithium","Warfarin","Phenytoin level"] }
+  ]},
+  { title:"Autonomic Pharmacology", groups:[
+    { level:"yellow", category:"Sympathomimetic effects", items:["Increased heart rate","Bronchodilation","Pupil dilation","Vasoconstriction"] },
+    { level:"green", category:"Parasympathomimetic effects", items:["Decreased heart rate","Bronchoconstriction","Pupil constriction","Increased secretions"] },
+    { level:"blue", category:"Anticholinergic side effects (mnemonic-adjacent)", items:["Dry mouth","Blurred vision","Urinary retention","Constipation"] },
+    { level:"purple", category:"Adrenergic receptor subtypes", items:["Alpha-1","Alpha-2","Beta-1","Beta-2"] }
+  ]},
+  { title:"Drugs in Pregnancy & Special Populations", groups:[
+    { level:"yellow", category:"Drugs teratogenic in pregnancy", items:["Isotretinoin","Warfarin","ACE inhibitors","Valproate"] },
+    { level:"green", category:"Drugs requiring renal dose adjustment", items:["Gabapentin","Metformin","Enoxaparin","Vancomycin"] },
+    { level:"blue", category:"Drugs to avoid in older adults (Beers criteria examples)", items:["Diphenhydramine","Benzodiazepines","NSAIDs long-term","Anticholinergics"] },
+    { level:"purple", category:"Drugs safe in breastfeeding", items:["Acetaminophen","Most penicillins","Insulin","Levothyroxine"] }
+  ]},
+  { title:"Adverse Drug Reactions", groups:[
+    { level:"yellow", category:"Drugs causing QT prolongation", items:["Methadone","Haloperidol","Erythromycin","Ondansetron"] },
+    { level:"green", category:"Drugs causing hepatotoxicity", items:["Acetaminophen (overdose)","Isoniazid","Valproate","Methotrexate"] },
+    { level:"blue", category:"Drugs causing nephrotoxicity", items:["Aminoglycosides","NSAIDs","Contrast dye","Vancomycin"] },
+    { level:"purple", category:"Drug-induced lupus causes", items:["Hydralazine","Procainamide","Quinidine","Minocycline"] }
+  ]},
+  { title:"Endocrine & Metabolic Pharmacology", groups:[
+    { level:"yellow", category:"Insulin types by onset", items:["Rapid-acting","Short-acting","Intermediate-acting","Long-acting"] },
+    { level:"green", category:"Oral diabetes drug classes", items:["Sulfonylureas","Biguanides","DPP-4 inhibitors","SGLT2 inhibitors"] },
+    { level:"blue", category:"Corticosteroid side effects", items:["Hyperglycemia","Osteoporosis","Immunosuppression","Mood changes"] },
+    { level:"purple", category:"Thyroid medication mechanisms", items:["Hormone replacement","Peroxidase inhibition","Iodine uptake blockade","Beta blockade for symptoms"] }
+  ]},
+  { title:"Cell Biology & Genetics", groups:[
+    { level:"yellow", category:"Cell organelles", items:["Mitochondria","Endoplasmic reticulum","Golgi apparatus","Lysosome"] },
+    { level:"green", category:"Phases of the cell cycle", items:["G1 phase","S phase","G2 phase","Mitosis"] },
+    { level:"blue", category:"Modes of inheritance", items:["Autosomal dominant","Autosomal recessive","X-linked recessive","Mitochondrial"] },
+    { level:"purple", category:"DNA repair and replication enzymes", items:["DNA polymerase","Helicase","Ligase","Topoisomerase"] }
+  ]},
+  { title:"Embryology", groups:[
+    { level:"yellow", category:"Primary germ layers", items:["Ectoderm","Mesoderm","Endoderm","Neural crest"] },
+    { level:"green", category:"Structures derived from ectoderm", items:["Epidermis","Central nervous system","Peripheral nervous system","Lens of the eye"] },
+    { level:"blue", category:"Pharyngeal arch derivatives", items:["First arch (mandible)","Second arch (stapes)","Third arch (thyrohyoid)","Fourth arch (thyroid cartilage)"] },
+    { level:"purple", category:"Fetal circulation structures", items:["Ductus arteriosus","Ductus venosus","Foramen ovale","Umbilical vein"] }
+  ]},
+  { title:"Muscle & Nerve Physiology", groups:[
+    { level:"yellow", category:"Types of muscle contraction", items:["Isotonic","Isometric","Concentric","Eccentric"] },
+    { level:"green", category:"Neuromuscular junction components", items:["Acetylcholine","Nicotinic receptor","Motor end plate","Synaptic cleft"] },
+    { level:"blue", category:"Phases of the cardiac action potential", items:["Phase 0 (upstroke)","Phase 1 (notch)","Phase 2 (plateau)","Phase 3 (repolarization)"] },
+    { level:"purple", category:"Sarcomere components", items:["Actin","Myosin","Troponin","Tropomyosin"] }
+  ]},
+  { title:"Renal & Acid-Base Physiology", groups:[
+    { level:"yellow", category:"Nephron segments", items:["Proximal convoluted tubule","Loop of Henle","Distal convoluted tubule","Collecting duct"] },
+    { level:"green", category:"Hormones acting on the kidney", items:["Aldosterone","Antidiuretic hormone","Parathyroid hormone","Atrial natriuretic peptide"] },
+    { level:"blue", category:"Components of the renin-angiotensin-aldosterone system", items:["Renin","Angiotensinogen","Angiotensin-converting enzyme","Aldosterone release"] },
+    { level:"purple", category:"Renal clearance and filtration concepts", items:["Glomerular filtration rate","Filtration fraction","Renal plasma flow","Creatinine clearance"] }
+  ]},
+  { title:"Endocrine Physiology", groups:[
+    { level:"yellow", category:"Hormones that raise blood glucose", items:["Glucagon","Cortisol","Epinephrine","Growth hormone"] },
+    { level:"green", category:"Steroid hormones", items:["Progesterone","Aldosterone","Testosterone","Estrogen"] },
+    { level:"blue", category:"Peptide hormones", items:["Insulin","Oxytocin","Antidiuretic hormone","Parathyroid hormone"] },
+    { level:"purple", category:"Hormone receptor mechanisms", items:["Nuclear receptor","G protein-coupled receptor","Tyrosine kinase receptor","Ion channel receptor"] }
+  ]},
+  { title:"Gastrointestinal Physiology", groups:[
+    { level:"yellow", category:"GI hormones", items:["Gastrin","Secretin","Cholecystokinin","Motilin"] },
+    { level:"green", category:"Digestive enzymes", items:["Pepsin","Amylase","Lipase","Trypsin"] },
+    { level:"blue", category:"Functions of bile", items:["Fat emulsification","Cholesterol excretion","Bilirubin excretion","Fat-soluble vitamin absorption"] },
+    { level:"purple", category:"Sites of nutrient absorption", items:["Duodenum (iron)","Jejunum (most nutrients)","Ileum (B12 and bile acids)","Colon (water)"] }
+  ]},
+  { title:"Immunology", groups:[
+    { level:"yellow", category:"Types of hypersensitivity reactions", items:["Type I (immediate)","Type II (cytotoxic)","Type III (immune complex)","Type IV (delayed)"] },
+    { level:"green", category:"Immune cell types", items:["T lymphocytes","B lymphocytes","Macrophages","Natural killer cells"] },
+    { level:"blue", category:"Immunoglobulin classes", items:["IgG","IgM","IgA","IgE"] },
+    { level:"purple", category:"Cytokines and their function", items:["Interleukin-2","Interferon-gamma","Tumor necrosis factor","Interleukin-6"] }
+  ]},
+  { title:"Ophthalmology", groups:[
+    { level:"yellow", category:"Causes of painless vision loss", items:["Central retinal artery occlusion","Retinal detachment","Age-related macular degeneration","Ischemic optic neuropathy"] },
+    { level:"green", category:"Causes of red, painful eye", items:["Acute angle-closure glaucoma","Uveitis","Corneal abrasion","Scleritis"] },
+    { level:"blue", category:"Diabetic retinopathy findings", items:["Microaneurysms","Cotton wool spots","Neovascularization","Retinal hemorrhages"] },
+    { level:"purple", category:"Eye structures involved in vision", items:["Cornea","Lens","Retina","Optic nerve"] }
+  ]},
+  { title:"ENT & Head/Neck", groups:[
+    { level:"yellow", category:"Causes of vertigo", items:["Benign paroxysmal positional vertigo","Meniere disease","Vestibular neuritis","Labyrinthitis"] },
+    { level:"green", category:"Causes of sore throat", items:["Streptococcal pharyngitis","Viral pharyngitis","Peritonsillar abscess","Mononucleosis"] },
+    { level:"blue", category:"Causes of hearing loss", items:["Otosclerosis","Presbycusis","Noise-induced hearing loss","Cholesteatoma"] },
+    { level:"purple", category:"Structures of the middle ear", items:["Malleus","Incus","Stapes","Tympanic membrane"] }
+  ]},
+  { title:"Urology", groups:[
+    { level:"yellow", category:"Causes of urinary incontinence", items:["Stress incontinence","Urge incontinence","Overflow incontinence","Functional incontinence"] },
+    { level:"green", category:"Causes of scrotal pain", items:["Testicular torsion","Epididymitis","Orchitis","Inguinal hernia"] },
+    { level:"blue", category:"Prostate conditions", items:["Benign prostatic hyperplasia","Prostatitis","Prostate cancer","Prostatic abscess"] },
+    { level:"purple", category:"Erectile dysfunction risk factors", items:["Diabetes","Cardiovascular disease","Smoking","Certain medications"] }
+  ]},
+  { title:"Emergency Medicine & Toxicology", groups:[
+    { level:"yellow", category:"Signs of anticholinergic toxicity (mnemonic-adjacent)", items:["Dry as a bone","Red as a beet","Blind as a bat","Mad as a hatter"] },
+    { level:"green", category:"Signs of opioid toxicity", items:["Pinpoint pupils","Respiratory depression","Sedation","Decreased bowel sounds"] },
+    { level:"blue", category:"Common toxidromes", items:["Anticholinergic toxidrome","Cholinergic toxidrome","Sympathomimetic toxidrome","Sedative-hypnotic toxidrome"] },
+    { level:"purple", category:"Trauma primary survey (ABCDE)", items:["Airway","Breathing","Circulation","Disability"] }
+  ]},
+  { title:"Genetics", groups:[
+    { level:"yellow", category:"Trisomy syndromes", items:["Down syndrome (trisomy 21)","Edwards syndrome (trisomy 18)","Patau syndrome (trisomy 13)","Trisomy X"] },
+    { level:"green", category:"X-linked recessive conditions", items:["Hemophilia A","Duchenne muscular dystrophy","Color blindness","G6PD deficiency"] },
+    { level:"blue", category:"Autosomal dominant conditions", items:["Huntington disease","Marfan syndrome","Neurofibromatosis type 1","Achondroplasia"] },
+    { level:"purple", category:"Genetic testing methods", items:["Karyotype","Fluorescence in situ hybridization","Whole exome sequencing","Amniocentesis"] }
+  ]},
+  { title:"Medical Ethics & Biostatistics", groups:[
+    { level:"yellow", category:"Core principles of medical ethics", items:["Autonomy","Beneficence","Nonmaleficence","Justice"] },
+    { level:"green", category:"Measures of diagnostic test accuracy", items:["Sensitivity","Specificity","Positive predictive value","Negative predictive value"] },
+    { level:"blue", category:"Types of study bias", items:["Selection bias","Recall bias","Confounding","Lead-time bias"] },
+    { level:"purple", category:"Types of clinical study design", items:["Randomized controlled trial","Cohort study","Case-control study","Cross-sectional study"] }
+  ]}
+];
+
+const LEVEL_ORDER = ["yellow","green","blue","purple"];
+const LEVEL_EMOJI = { yellow:"\ud83d\udfe8", green:"\ud83d\udfe9", blue:"\ud83d\udfe6", purple:"\ud83d\udfea" };
+
+// Each date's Connections puzzle is decided ONCE and locked in permanently via
+// Firestore, exactly like Rxordle's daily drug assignment -- this is the fix
+// for the exact scenario the NOTE above warned about: growing PUZZLES from 15
+// to 115 shifted which puzzle every date resolves to, which both changed
+// today's live puzzle AND left already-saved progress silently mismatched
+// against a different puzzle. The live hash calculation below is now only
+// used (a) the very first time a date is ever requested by anyone, to decide
+// what gets locked in, and (b) as an offline fallback if Firestore is
+// unavailable, in which case stability isn't guaranteed for that session.
+const MC_ASSIGNMENT_VERSION = 1;
+function mcComputeLiveHashPuzzle(dateStr){
+  const idx = hashStr(dateStr) % PUZZLES.length;
+  return PUZZLES[idx];
+}
+// Manual overrides for specific dates, e.g. to feature a particularly good
+// puzzle on launch day. Checked before Firestore, so it always wins even if
+// that date already has a locked-in assignment from earlier testing.
+const MC_DATE_OVERRIDES = {
+  '2026-07-21': 'Cardiology Categories'
+};
+async function mcPuzzleForDate(dateStr){
+  const overrideTitle = MC_DATE_OVERRIDES[dateStr];
+  if(overrideTitle){
+    const override = PUZZLES.find(p => p.title === overrideTitle);
+    if(override) return override;
+  }
+  if(window.rxordleDb){
+    try{
+      const docRef = window.rxordleDb.collection('connectionsAssignments').doc(dateStr);
+      const assignedTitle = await window.rxordleDb.runTransaction(async (tx) => {
+        const snap = await tx.get(docRef);
+        const data = snap.exists ? snap.data() : null;
+        if(data && data.puzzleTitle && data.version === MC_ASSIGNMENT_VERSION){
+          return data.puzzleTitle;
+        }
+        const chosen = mcComputeLiveHashPuzzle(dateStr);
+        tx.set(docRef, { puzzleTitle: chosen.title, assignedAt: new Date().toISOString(), version: MC_ASSIGNMENT_VERSION });
+        return chosen.title;
+      });
+      const assignedPuzzle = PUZZLES.find(p => p.title === assignedTitle);
+      if(assignedPuzzle) return assignedPuzzle;
+    }catch(e){
+      console.warn('Could not read/write stable Connections daily assignment from Firestore; falling back to live hash for this session.', e);
+    }
+  }
+  return mcComputeLiveHashPuzzle(dateStr);
+}
+
+const PUZZLE_EPOCH = new Date('2026-01-01T00:00:00');
+// The date Medical Connections actually launched. Even though puzzleForDate()
+// can mathematically compute a puzzle for any date (including ones before the
+// game existed), the archive should never offer those pre-launch dates as
+// something to "go back and play" -- today (launch day) is the first entry
+// that will ever appear in the archive, once it's no longer "today".
+const MC_LAUNCH_DATE = '2026-07-21';
+function mcPuzzleNumber(dateStr){
+  const d = new Date(dateStr + 'T00:00:00');
+  const diffDays = Math.round((d - PUZZLE_EPOCH) / 86400000) + 1;
+  return Math.max(1, diffDays);
+}
+
+// ---------- Game state ----------
+let mcCtx = {
+  date: TODAY,
+  puzzle: null, // resolved asynchronously by mcLoadGame(TODAY) before any render happens
+  state: null
+};
+
+function mcStorageKeyFor(dateStr){ return 'medconnections-state-' + dateStr; }
+function mcFreshState(dateStr, puzzleTitle){
+  return {
+    date: dateStr,
+    puzzleTitle: puzzleTitle, // fingerprint: which puzzle this progress was recorded against
+    solvedLevels: [],   // e.g. ["yellow","blue"]
+    mistakes: 0,
+    guessRows: [],       // each: array of 4 item strings, in submission order
+    status: 'playing'    // 'playing' | 'won' | 'lost'
+  };
+}
+
+async function mcLoadGame(dateStr){
+  mcCtx.date = dateStr;
+  mcCtx.puzzle = await mcPuzzleForDate(dateStr);
+  mcCtx.state = mcFreshState(dateStr, mcCtx.puzzle.title);
+  mcSelected = [];
+  mcLastDisplayedLevels = [];
+  const raw = await storageAdapter.get(mcStorageKeyFor(dateStr));
+  if(raw){
+    try{
+      const parsed = JSON.parse(raw);
+      // Only trust saved progress if it was recorded against the SAME puzzle
+      // this date currently resolves to. If the puzzle pool changed since it
+      // was saved, old progress no longer applies to today's actual puzzle --
+      // start fresh instead of showing mismatched "already solved" categories
+      // from what is now a completely different puzzle.
+      if(parsed && parsed.date === dateStr && parsed.puzzleTitle === mcCtx.puzzle.title){
+        mcCtx.state = parsed;
+      }
+    }catch(e){}
+  }
+  mcRender();
+}
+async function mcSaveGame(){
+  await storageAdapter.set(mcStorageKeyFor(mcCtx.date), JSON.stringify(mcCtx.state));
+}
+
+// ---------- Stats ----------
+const MC_STATS_KEY = 'medconnections-stats';
+async function mcLoadStats(){
+  const raw = await storageAdapter.get(MC_STATS_KEY);
+  let stats = { played:0, wins:0, currentStreak:0, bestStreak:0, totalMistakesOnWin:0 };
+  if(raw){ try{ stats = Object.assign(stats, JSON.parse(raw)); }catch(e){} }
+  return stats;
+}
+async function mcSaveStats(stats){ await storageAdapter.set(MC_STATS_KEY, JSON.stringify(stats)); }
+async function mcRecordCompletion(won, mistakes){
+  if(mcCtx.state.statsRecorded) return;
+  mcCtx.state.statsRecorded = true;
+  await mcSaveGame();
+  const stats = await mcLoadStats();
+  stats.played += 1;
+  if(won){
+    stats.wins += 1;
+    stats.currentStreak += 1;
+    stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+    stats.totalMistakesOnWin += mistakes;
+  } else {
+    stats.currentStreak = 0;
+  }
+  await mcSaveStats(stats);
+}
+
+// ---------- DOM refs ----------
+const mcGridEl = document.getElementById('mcGrid');
+const mcSolvedGroupsEl = document.getElementById('mcSolvedGroups');
+const mcHintMsgEl = document.getElementById('mcHintMsg');
+const mcMistakeDotsEl = document.getElementById('mcMistakeDots');
+const mcShuffleBtn = document.getElementById('mcShuffleBtn');
+const mcDeselectBtn = document.getElementById('mcDeselectBtn');
+const mcSubmitBtn = document.getElementById('mcSubmitBtn');
+const mcControlsRow = document.getElementById('mcControlsRow');
+const mcBannerWrap = document.getElementById('mcBannerWrap');
+const mcDaytag = document.getElementById('mcDaytag');
+const mcFooterNote = document.getElementById('mcFooterNote');
+const mcCardTitle = document.getElementById('mcCardTitle');
+
+const mcTabToday = document.getElementById('mcTabToday');
+const mcTabArchive = document.getElementById('mcTabArchive');
+const mcTabStats = document.getElementById('mcTabStats');
+const mcGameCard = document.getElementById('mcGameCard');
+const mcArchiveCard = document.getElementById('mcArchiveCard');
+const mcStatsCard = document.getElementById('mcStatsCard');
+const mcArchiveList = document.getElementById('mcArchiveList');
+const mcStatsGrid = document.getElementById('mcStatsGrid');
+
+const MAX_MISTAKES = 4;
+let mcSelected = []; // array of item strings currently selected
+let mcDisplayOrder = []; // shuffled item list for unsolved tiles
+let mcGuessHistoryKeys = new Set(); // sorted+joined guesses already tried, to block exact repeats
+let mcLastDisplayedLevels = []; // levels shown as solved/revealed rows as of the previous render, so already-visible rows don't re-animate on every click
+
+function mcAllItemsForPuzzle(puzzle){
+  return puzzle.groups.flatMap(g => g.items);
+}
+function mcShuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function mcCategoryForItem(item){
+  return mcCtx.puzzle.groups.find(g => g.items.includes(item));
+}
+
+function mcRender(){
+  if(!mcCtx.puzzle || !mcCtx.state) return; // initial daily puzzle still loading
+  const isToday = mcCtx.date === TODAY;
+  mcDaytag.textContent = (isToday ? 'Today \u00b7 ' : '') + formatDayLabel(mcCtx.date) + ' \u00b7 #' + mcPuzzleNumber(mcCtx.date);
+  mcFooterNote.textContent = isToday
+    ? 'New puzzle every day at midnight, local time.'
+    : 'Playing an archived puzzle from ' + formatDayLabel(mcCtx.date) + '.';
+
+  const remainingItems = mcAllItemsForPuzzle(mcCtx.puzzle).filter(item => {
+    const cat = mcCategoryForItem(item);
+    return !mcCtx.state.solvedLevels.includes(cat.level);
+  });
+  // Always drop solved items out of the display order (this used to be a
+  // conditional refresh based on comparing lengths, but that count could
+  // coincidentally match even when stale solved items were still mixed in,
+  // so solved tiles never actually disappeared from the grid). Any items
+  // genuinely missing (only happens on first load) get shuffled in; existing
+  // unsolved tile positions are otherwise left alone so the grid doesn't
+  // needlessly reshuffle on every mcRender.
+  mcDisplayOrder = mcDisplayOrder.filter(item => remainingItems.includes(item));
+  const missingItems = remainingItems.filter(item => !mcDisplayOrder.includes(item));
+  if(missingItems.length > 0){
+    mcDisplayOrder = mcDisplayOrder.concat(mcShuffleArray(missingItems));
+  }
+
+  // Solved groups (in canonical yellow->purple order). mcRender() runs on
+  // every tile click, not just on submitted guesses -- unconditionally
+  // clearing and rebuilding this section every time would retrigger the
+  // entrance animation on already-solved rows on every single click,
+  // making them visibly "flash". Instead, always rebuild the DOM (simple,
+  // avoids duplicate-append edge cases) but only apply the animation class
+  // to rows that weren't already showing as of the previous render.
+  const roundOver = mcCtx.state.status !== 'playing';
+  const levelsToShow = LEVEL_ORDER.filter(level => mcCtx.state.solvedLevels.includes(level) || roundOver);
+  mcSolvedGroupsEl.innerHTML = '';
+  levelsToShow.forEach(level => {
+    const group = mcCtx.puzzle.groups.find(g => g.level === level);
+    const isNew = !mcLastDisplayedLevels.includes(level);
+    const row = document.createElement('div');
+    row.className = 'solved-row ' + level + (isNew ? '' : ' no-anim');
+    row.innerHTML = '<div class="cat">' + group.category + '</div><div class="items">' + group.items.join(', ') + '</div>';
+    mcSolvedGroupsEl.appendChild(row);
+  });
+  mcLastDisplayedLevels = levelsToShow.slice();
+
+  // Grid
+  mcGridEl.innerHTML = '';
+  if(roundOver && mcCtx.state.solvedLevels.length < 4){
+    // Remaining groups were already appended above as part of levelsToShow.
+  } else {
+    mcDisplayOrder.forEach(item => {
+      const tile = document.createElement('div');
+      tile.className = 'tile' + (mcSelected.includes(item) ? ' selected' : '');
+      tile.textContent = item;
+      tile.onclick = () => mcToggleSelect(item);
+      mcGridEl.appendChild(tile);
+    });
+  }
+
+  // Mistake dots
+  mcMistakeDotsEl.innerHTML = '';
+  for(let i=0;i<MAX_MISTAKES;i++){
+    const dot = document.createElement('div');
+    dot.className = 'mistake-dot' + (i < mcCtx.state.mistakes ? ' used' : '');
+    mcMistakeDotsEl.appendChild(dot);
+  }
+
+  mcSubmitBtn.disabled = mcSelected.length !== 4 || roundOver;
+  mcDeselectBtn.disabled = mcSelected.length === 0 || roundOver;
+  mcShuffleBtn.disabled = roundOver;
+  mcControlsRow.style.display = roundOver ? 'none' : 'flex';
+  mcHintMsgEl.textContent = '';
+
+  mcBannerWrap.innerHTML = '';
+  if(mcCtx.state.status === 'won'){
+    const banner = document.createElement('div');
+    banner.className = 'banner win';
+    banner.textContent = '\ud83c\udf89 Solved it with ' + mcCtx.state.mistakes + ' mistake' + (mcCtx.state.mistakes===1?'':'s') + '!';
+    mcBannerWrap.appendChild(banner);
+    mcBannerWrap.appendChild(mcBuildShareBox(true));
+  } else if(mcCtx.state.status === 'lost'){
+    const banner = document.createElement('div');
+    banner.className = 'banner lose';
+    banner.textContent = 'Out of guesses. Here are today\u2019s groups.';
+    mcBannerWrap.appendChild(banner);
+    mcBannerWrap.appendChild(mcBuildShareBox(false));
+  }
+}
+
+function mcToggleSelect(item){
+  if(!mcCtx.puzzle || !mcCtx.state) return; // initial daily puzzle still loading
+  if(mcCtx.state.status !== 'playing') return;
+  if(mcSelected.includes(item)){
+    mcSelected = mcSelected.filter(i => i !== item);
+  } else {
+    if(mcSelected.length >= 4) return;
+    mcSelected.push(item);
+  }
+  mcRender();
+}
+
+mcDeselectBtn.addEventListener('click', () => { mcSelected = []; mcRender(); });
+mcShuffleBtn.addEventListener('click', () => {
+  mcDisplayOrder = mcShuffleArray(mcDisplayOrder);
+  mcRender();
+});
+
+mcSubmitBtn.addEventListener('click', async () => {
+  if(!mcCtx.puzzle || !mcCtx.state) return; // initial daily puzzle still loading
+  if(mcSelected.length !== 4 || mcCtx.state.status !== 'playing') return;
+  const key = mcSelected.slice().sort().join('|');
+  if(mcGuessHistoryKeys.has(key)){
+    mcHintMsgEl.textContent = 'Already tried that combination.';
+    return;
+  }
+  mcGuessHistoryKeys.add(key);
+
+  const cats = mcSelected.map(mcCategoryForItem);
+  const allSame = cats.every(c => c.level === cats[0].level);
+  mcCtx.state.guessRows.push(mcSelected.slice());
+
+  if(allSame){
+    mcCtx.state.solvedLevels.push(cats[0].level);
+    mcSelected = [];
+    if(mcCtx.state.solvedLevels.length === 4){
+      mcCtx.state.status = 'won';
+      await mcSaveGame();
+      await mcRecordCompletion(true, mcCtx.state.mistakes);
+      mcRender();
+      return;
+    }
+    await mcSaveGame();
+    mcRender();
+    return;
+  }
+
+  // Wrong guess
+  const counts = {};
+  cats.forEach(c => { counts[c.level] = (counts[c.level]||0) + 1; });
+  const maxCount = Math.max(...Object.values(counts));
+  mcCtx.state.mistakes += 1;
+
+  // shake the wrong tiles
+  Array.from(mcGridEl.children).forEach(tile => {
+    if(mcSelected.includes(tile.textContent)){
+      tile.classList.add('shake');
+      setTimeout(() => tile.classList.remove('shake'), 550);
+    }
+  });
+
+  if(mcCtx.state.mistakes >= MAX_MISTAKES){
+    mcCtx.state.status = 'lost';
+    mcSelected = [];
+    await mcSaveGame();
+    await mcRecordCompletion(false, mcCtx.state.mistakes);
+    mcRender();
+    return;
+  }
+
+  mcSelected = [];
+  await mcSaveGame();
+  mcRender();
+  mcHintMsgEl.textContent = (maxCount === 3) ? 'One away...' : 'Not quite \u2014 try again.';
+});
+
+// ---------- Share ----------
+function mcBuildShareBox(won){
+  const wrap = document.createElement('div');
+  wrap.className = 'share-wrap';
+  const lines = ['Medical Connections #' + mcPuzzleNumber(mcCtx.date)];
+  mcCtx.state.guessRows.forEach(row => {
+    lines.push(row.map(item => LEVEL_EMOJI[mcCategoryForItem(item).level]).join(''));
+  });
+  lines.push('');
+  lines.push('https://rxordle.org/connections');
+  const text = lines.join('\n');
+
+  const textarea = document.createElement('textarea');
+  textarea.className = 'share-box';
+  textarea.rows = mcCtx.state.guessRows.length + 3;
+  textarea.readOnly = true;
+  textarea.value = text;
+
+  const btn = document.createElement('button');
+  btn.className = 'copybtn';
+  btn.textContent = 'Copy to share';
+  const showCopied = () => { btn.textContent = 'Copied!'; setTimeout(()=>{ btn.textContent='Copy to share'; }, 1800); };
+  const fallbackCopy = () => {
+    try{
+      textarea.removeAttribute('readonly');
+      textarea.focus(); textarea.select(); textarea.setSelectionRange(0, text.length);
+      const ok = document.execCommand('copy');
+      textarea.setAttribute('readonly','');
+      if(ok) showCopied(); else btn.textContent = 'Tap the text above to select it';
+    }catch(e){ btn.textContent = 'Tap the text above to select it'; }
+  };
+  btn.onclick = () => {
+    if(window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showCopied).catch(fallbackCopy);
+    } else { fallbackCopy(); }
+  };
+  wrap.appendChild(textarea);
+  wrap.appendChild(btn);
+  return wrap;
+}
+
+// ---------- Tabs ----------
+function mcSetActiveTab(tab){
+  mcTabToday.classList.toggle('active', tab==='today');
+  mcTabArchive.classList.toggle('active', tab==='archive');
+  mcTabStats.classList.toggle('active', tab==='stats');
+  mcGameCard.style.display = tab==='today' ? 'block' : 'none';
+  mcArchiveCard.style.display = tab==='archive' ? 'block' : 'none';
+  mcStatsCard.style.display = tab==='stats' ? 'block' : 'none';
+}
+mcTabToday.addEventListener('click', () => { mcSetActiveTab('today'); mcLoadGame(TODAY); });
+mcTabArchive.addEventListener('click', () => { mcSetActiveTab('archive'); mcRenderArchiveList(); });
+mcTabStats.addEventListener('click', () => { mcSetActiveTab('stats'); mcRenderStats(); });
+
+async function mcRenderArchiveList(){
+  mcArchiveList.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:0.85rem;padding:1rem;">Loading past puzzles...</div>';
+  const dates = [];
+  for(let i=1;i<=ARCHIVE_DAYS;i++){
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    const dateStr = fmtDate(d);
+    if(dateStr < MC_LAUNCH_DATE) break; // don't offer dates before the game existed
+    dates.push(dateStr);
+  }
+  if(dates.length === 0){
+    mcArchiveList.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:0.85rem;padding:1rem;">No archived puzzles yet \u2014 check back after today\'s puzzle!</div>';
+    return;
+  }
+  const rows = await Promise.all(dates.map(async dateStr => {
+    const raw = await storageAdapter.get(mcStorageKeyFor(dateStr));
+    let status='unplayed', label='Not played';
+    if(raw){
+      try{
+        const parsed = JSON.parse(raw);
+        if(parsed.status==='won'){ status='solved'; label='Solved (' + parsed.mistakes + ' mistake' + (parsed.mistakes===1?'':'s') + ')'; }
+        else if(parsed.status==='lost'){ status='failed'; label='Failed'; }
+        else { status='unplayed'; label='In progress'; }
+      }catch(e){}
+    }
+    return { dateStr, status, label };
+  }));
+  mcArchiveList.innerHTML = '';
+  rows.forEach(row => {
+    const div = document.createElement('div');
+    div.className = 'archive-item';
+    div.innerHTML = '<span class="adate">'+formatDayLabel(row.dateStr)+'</span><span class="astatus '+row.status+'">'+row.label+'</span>';
+    div.addEventListener('click', () => { mcSetActiveTab('today'); mcLoadGame(row.dateStr); });
+    mcArchiveList.appendChild(div);
+  });
+}
+
+async function mcRenderStats(){
+  const stats = await mcLoadStats();
+  const winPct = stats.played > 0 ? Math.round((stats.wins/stats.played)*100) : 0;
+  const avgMistakes = stats.wins > 0 ? (stats.totalMistakesOnWin/stats.wins).toFixed(1) : 'N/A';
+  mcStatsGrid.innerHTML = '';
+  [
+    { val: stats.played, lbl: 'Games played' },
+    { val: winPct+'%', lbl: 'Win rate' },
+    { val: stats.currentStreak, lbl: 'Current streak' },
+    { val: stats.bestStreak, lbl: 'Best streak' },
+    { val: avgMistakes, lbl: 'Avg. mistakes on win' }
+  ].forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    card.innerHTML = '<div class="val">'+c.val+'</div><div class="lbl">'+c.lbl+'</div>';
+    mcStatsGrid.appendChild(card);
+  });
+}
+
+// mcLoadGame(TODAY) is called from Rxordle's own startup sequence,
+// alongside its existing loadGame(TODAY)/initPlayerBadge()/initSettings() calls.
+
+// ---------- Game switcher (Rxordle / Connections) ----------
+const switchRxordle = document.getElementById('switchRxordle');
+const switchConnections = document.getElementById('switchConnections');
+const rxordleApp = document.getElementById('rxordleApp');
+const connectionsApp = document.getElementById('connectionsApp');
+const siteTitleEl = document.querySelector('.topbar h1');
+
+switchRxordle.addEventListener('click', () => {
+  switchRxordle.classList.add('active');
+  switchConnections.classList.remove('active');
+  rxordleApp.style.display = 'block';
+  connectionsApp.style.display = 'none';
+  if(siteTitleEl) siteTitleEl.textContent = 'Rxordle';
+});
+switchConnections.addEventListener('click', () => {
+  switchConnections.classList.add('active');
+  switchRxordle.classList.remove('active');
+  rxordleApp.style.display = 'none';
+  connectionsApp.style.display = 'block';
+  if(siteTitleEl) siteTitleEl.textContent = 'Medical Connections';
+});
+
 loadGame(TODAY);
 initPlayerBadge();
 initSettings();
+mcLoadGame(TODAY);
 </script>
 </body>
 </html>

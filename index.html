@@ -4378,6 +4378,15 @@ function computeLiveHashDrug(dateStr){
   }
   return DRUGS[DRUGS.length - 1]; // fallback, should not normally be reached
 }
+// Bump this whenever the hash function, weighting, or pool changes in a way
+// that should invalidate previously-locked assignments. Any Firestore
+// assignment doc missing this version (or with an older one) is treated as
+// stale and silently recomputed + overwritten on next visit -- this is what
+// lets a hash-function bug fix (like the one that caused the same drug to
+// repeat for several days straight) self-heal across every date without
+// anyone having to manually delete documents in the Firestore console.
+const ASSIGNMENT_VERSION = 2;
+
 async function drugForDate(dateStr){
   const overrideName = DATE_OVERRIDES[dateStr];
   if(overrideName){
@@ -4390,13 +4399,14 @@ async function drugForDate(dateStr){
       const docRef = window.rxordleDb.collection('dailyAssignments').doc(dateStr);
       const assignedName = await window.rxordleDb.runTransaction(async (tx) => {
         const snap = await tx.get(docRef);
-        if(snap.exists && snap.data() && snap.data().drugName){
-          return snap.data().drugName;
+        const data = snap.exists ? snap.data() : null;
+        if(data && data.drugName && data.version === ASSIGNMENT_VERSION){
+          return data.drugName;
         }
-        // First time this date has ever been requested by anyone: pick a
-        // drug from the current pool and permanently lock it in.
+        // Either never assigned, or assigned under an older/broken version:
+        // pick fresh from the current pool and (re)lock it in.
         const chosen = computeLiveHashDrug(dateStr);
-        tx.set(docRef, { drugName: chosen.name, assignedAt: new Date().toISOString() });
+        tx.set(docRef, { drugName: chosen.name, assignedAt: new Date().toISOString(), version: ASSIGNMENT_VERSION });
         return chosen.name;
       });
       const assignedDrug = DRUGS.find(d => d.name === assignedName);
